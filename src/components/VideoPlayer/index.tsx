@@ -75,7 +75,7 @@ export type Props = EventBase & {
     HTMLVideoElement
   >
 
-  renderSiderActionArea?: () => ReactElement
+  renderSideActionArea?: () => ReactElement
 }
 
 export type VideoPlayerHandle = {
@@ -721,13 +721,13 @@ const VideoPlayer = observer(
         </div>
 
         {/* 侧边操作栏 */}
-        {props.renderSiderActionArea && (
+        {props.renderSideActionArea && (
           <div
             className="side-action-area"
-            onMouseEnter={(e) => handleFullscreenShowActionArea(true)}
-            onMouseLeave={handleResetActionAreaShow}
+            // onMouseEnter={(e) => handleFullscreenShowActionArea(true)}
+            // onMouseLeave={handleResetActionAreaShow}
           >
-            {props.renderSiderActionArea()}
+            {props.renderSideActionArea()}
           </div>
         )}
 
