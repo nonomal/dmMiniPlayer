@@ -6,7 +6,9 @@ import { dq1 } from '@root/utils'
 import { Input } from 'antd'
 import { useRef, useState, type FC } from 'react'
 import './videoPlayer_App.less'
+import { listSelector } from '@root/utils/listSelector'
 
+window.listSelector = listSelector
 const Side: FC = () => {
   return (
     <div className="side-outer-container">
