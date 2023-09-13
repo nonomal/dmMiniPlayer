@@ -1,4 +1,4 @@
-import { throttle } from 'lodash-es'
+import { throttle } from '.'
 import { getTopParentsWithSameRect } from './dom'
 
 export function listSelector() {

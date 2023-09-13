@@ -1,4 +1,3 @@
-import { throttle } from 'lodash-es'
 import DanmakuController, { type DanmakuProps } from '../danmaku'
 import configStore from '../store/config'
 import { observe } from 'mobx'
@@ -7,7 +6,7 @@ import { type PlayerEvents } from './event'
 import type { Props as BarrageSenderProps } from './danmaku/BarrageSender'
 import { onceCallGet } from '@root/utils/decorator'
 import videoRender from '@root/store/videoRender'
-import { addEventListener } from '@root/utils'
+import { addEventListener, throttle } from '@root/utils'
 
 export type MiniPlayerProps = {
   videoEl: HTMLVideoElement

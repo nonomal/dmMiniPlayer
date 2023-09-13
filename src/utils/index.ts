@@ -1,9 +1,46 @@
-import { isNumber, isNull, isEqual, extend, isFunction } from 'lodash-es'
+import isEqual from 'fast-deep-equal'
 import type { CSSProperties } from 'react'
-import AsyncLock from './AsyncLock'
 import type { Rec } from './typeUtils'
 
 let el: HTMLSpanElement = null
+
+export function throttle<T extends noop>(func: T, delay: number): T {
+  let timerId: NodeJS.Timeout
+  return function (...args: any) {
+    if (!timerId) {
+      timerId = setTimeout(() => {
+        func.apply(this, ...args)
+        timerId = null
+      }, delay)
+    }
+  } as T
+}
+export const isNumber = (val: any): val is number => typeof val == 'number'
+export const isNull = (val: any): val is null => val == null
+export const isArray = (val: any): val is Array<any> => val instanceof Array
+export const isString = (val: any): val is string => typeof val == 'string'
+export const isObject = (val: any): val is object => typeof val == 'object'
+export const isUndefined = (val: any): val is undefined =>
+  typeof val == 'undefined'
+export const isNone = (val: any): val is null | undefined =>
+  isNull(val) || isUndefined(val)
+
+export function omit<T, K extends keyof T>(obj: T, key: K[]): Omit<T, K> {
+  let rs = { ...obj }
+  key.forEach((k) => delete rs[k])
+  return rs
+}
+export function get<T>(tar: any, key: string, defaultVal?: T): T {
+  const keyArr = key.split('.')
+  let val = tar
+  while (keyArr.length) {
+    const key = keyArr.shift()
+    if (isUndefined(val[key])) return defaultVal
+    val = val[key]
+  }
+  return val
+}
+
 export function getTextWidth(text: string, style: CSSProperties): number {
   if (!el) {
     el = document.createElement('span')
@@ -163,6 +200,7 @@ export function createElement<T extends HTMLElement>(
 
 export let minmax = (v: number, min = v, max = v): number =>
   v < min ? min : v > max ? max : v
+export const clamp = minmax
 
 export function formatTime(time: number, hasMs?: boolean): string {
   let min = ~~(time / 60),

@@ -6,8 +6,7 @@ import {
   onVideoPlayerLoad,
 } from '@root/components/VideoPlayer/events'
 import configStore, { DocPIPRenderType } from '@root/store/config'
-import { createElement } from '@root/utils'
-import { throttle } from 'lodash-es'
+import { createElement, throttle } from '@root/utils'
 import { makeAutoObservable } from 'mobx'
 import { createRoot } from 'react-dom/client'
 import styleUrl from 'url:./DocMiniPlayer.less'
