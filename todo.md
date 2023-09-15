@@ -6,3 +6,4 @@
 - [ ] 优化MiniPlayer
   - [ ] 视频fps和弹幕fps分开，视频在帧数空档期为image渲染，不知道会不会影响性能
 - [ ] option页面优化
+- [ ] 自定义selector的dom视图 https://luna.liriliri.io/?path=/story/dom-viewer--dom-viewer

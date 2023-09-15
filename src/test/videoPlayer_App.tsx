@@ -77,6 +77,24 @@ const App = () => {
       >
         test
       </button>
+
+      <div>
+        <ul className="select-list">
+          {new Array(10).fill(0).map((_, i) => {
+            return (
+              <li
+                className="select"
+                key={i}
+                onClick={() => {
+                  console.log('adf')
+                }}
+              >
+                第{i + 1}集
+              </li>
+            )
+          })}
+        </ul>
+      </div>
     </div>
   )
 }

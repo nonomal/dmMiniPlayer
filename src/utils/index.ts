@@ -4,38 +4,10 @@ import type { Rec } from './typeUtils'
 
 let el: HTMLSpanElement = null
 
-export function throttle<T extends noop>(fn: T, wait: number): T {
-  let callback = fn
-  let timerId: NodeJS.Timeout = null
+import _throttle from './feat/throttle'
+// export * as debounce from './feat/debounce'
 
-  // 是否是第一次执行
-  let firstInvoke = true
-
-  function throttled(...args: any) {
-    // 如果是第一次触发，直接执行
-    if (firstInvoke) {
-      callback(...args)
-      firstInvoke = false
-      return
-    }
-
-    // 如果定时器已存在，直接返回。
-    if (timerId) {
-      return
-    }
-
-    timerId = setTimeout(function () {
-      // 注意这里 将 clearTimeout 放到 内部来执行了
-      clearTimeout(timerId)
-      timerId = null
-
-      callback(...args)
-    }, wait)
-  }
-
-  return throttled as T
-}
-
+export const throttle = _throttle
 export const isNumber = (val: any): val is number => typeof val == 'number'
 export const isNull = (val: any): val is null => val == null
 export const isArray = (val: any): val is Array<any> => val instanceof Array
@@ -170,7 +142,7 @@ export async function wait(time = 0) {
   return new Promise<void>((res) => setTimeout(res, time))
 }
 
-type noop = (this: any, ...args: any[]) => any
+export type noop = (this: any, ...args: any[]) => any
 
 export function onceCall<T extends noop>(fn: T): T {
   if (isPromiseFunction(fn)) return oncePromise(fn)
