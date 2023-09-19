@@ -1,3 +1,4 @@
+import DocMiniPlayer from '@root/core/DocMiniPlayer'
 import type MiniPlayer from '@root/core/miniPlayer'
 import type { DanType } from '@root/danmaku'
 import { DanmakuStack } from '@root/danmaku/bilibili/barrageDownload/converter/danmaku-stack'
@@ -11,9 +12,10 @@ import { onMessage, sendMessage } from '@root/inject/contentSender'
 import configStore from '@root/store/config'
 import { dq1 } from '@root/utils'
 import AssParser from '@root/utils/AssParser'
+import { windowsOnceCall } from '@root/utils/decorator'
 import type { OrPromise } from '@root/utils/typeUtils'
 import WebProvider from '../webProvider'
-import { windowsOnceCall } from '@root/utils/decorator'
+import { initSideActionAreaRender } from './sider'
 
 export default class BilibiliVideoProvider extends WebProvider {
   videoEl: HTMLVideoElement
@@ -70,6 +72,9 @@ export default class BilibiliVideoProvider extends WebProvider {
     const miniPlayer = await super.initMiniPlayer(options)
     this.videoEl = this.miniPlayer.webPlayerVideoEl
 
+    if (miniPlayer instanceof DocMiniPlayer) {
+      initSideActionAreaRender(miniPlayer)
+    }
     this.miniPlayer.on('PIPClose', () => {
       this.videoEl.pause()
     })

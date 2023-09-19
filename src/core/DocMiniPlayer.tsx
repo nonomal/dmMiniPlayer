@@ -15,6 +15,8 @@ import BarrageSender, {
 } from './danmaku/BarrageSender'
 import MiniPlayer from './miniPlayer'
 import { observeVideoEl } from '@root/utils/observeVideoEl'
+import { type ReactElement } from 'react'
+import { runInAction } from 'mobx'
 
 export default class DocMiniPlayer extends MiniPlayer {
   pipWindow: Window
@@ -29,6 +31,8 @@ export default class DocMiniPlayer extends MiniPlayer {
   videoPlayer: HTMLElement
   sender: BarrageSender
   vpMobxOption = makeAutoObservable({ canSendBarrage: false })
+
+  renderSideActionArea: () => ReactElement
 
   /**canvas的captureStream */
   private _webPlayerVideoStream: MediaStream
@@ -130,6 +134,7 @@ export default class DocMiniPlayer extends MiniPlayer {
           webVideo={this.webPlayerVideoEl}
           keydownWindow={pipWindow}
           mobxOption={this.vpMobxOption}
+          renderSideActionArea={this.renderSideActionArea()}
         />
       )
     }
@@ -185,6 +190,7 @@ export default class DocMiniPlayer extends MiniPlayer {
         webVideo={this.webPlayerVideoEl}
         keydownWindow={pipWindow}
         mobxOption={this.vpMobxOption}
+        renderSideActionArea={this.renderSideActionArea()}
         ref={(ref) => {
           if (!ref) return
           vpRef = ref
@@ -258,6 +264,7 @@ export default class DocMiniPlayer extends MiniPlayer {
         keydownWindow={pipWindow}
         useWebVideo
         mobxOption={this.vpMobxOption}
+        renderSideActionArea={this.renderSideActionArea()}
         ref={(ref) => {
           if (!ref) return
           vpRef = ref
@@ -392,7 +399,9 @@ export default class DocMiniPlayer extends MiniPlayer {
         }
       })
 
-      this.vpMobxOption.canSendBarrage = true
+      runInAction(() => {
+        this.vpMobxOption.canSendBarrage = true
+      })
     } catch (error) {
       console.error('初始化BarrageSender错误', error)
     }

@@ -68,6 +68,10 @@ export const baseConfigMap = {
     group: [MaxTunnelType['1/2'], MaxTunnelType['1/4'], MaxTunnelType.full],
   }),
 
+  sideWidth: config({
+    defaultValue: 200,
+    label: '侧边栏宽度',
+  }),
   // TODO
   // showInfoInBackOrForward: config({
   //   defaultValue: true,

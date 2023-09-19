@@ -1,5 +1,5 @@
 import ProgressBar from '@root/components/ProgressBar'
-import _env from '@root/store/config'
+import _env, { configStore } from '@root/store/config'
 import { formatTime, minmax, wait } from '@root/utils'
 import cls from 'classnames'
 import {
@@ -10,7 +10,7 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-  useMemo,
+  type CSSProperties,
 } from 'react'
 import { checkJumpInBufferArea } from './utls'
 import VolumeBar from './VolumeBar'
@@ -75,7 +75,7 @@ export type Props = EventBase & {
     HTMLVideoElement
   >
 
-  renderSideActionArea?: () => ReactElement
+  renderSideActionArea?: ReactElement
 }
 
 export type VideoPlayerHandle = {
@@ -644,6 +644,11 @@ const VideoPlayer = observer(
           'is-firstplay': isFirstPlay,
           'is-live': getIsLive(),
         })}
+        style={
+          {
+            '--side-width': configStore.sideWidth + 'px',
+          } as CSSProperties
+        }
         tabIndex={-1}
         data-vid={index}
         onFocus={() => setFoucs(true)}
@@ -727,7 +732,7 @@ const VideoPlayer = observer(
             // onMouseEnter={(e) => handleFullscreenShowActionArea(true)}
             // onMouseLeave={handleResetActionAreaShow}
           >
-            {props.renderSideActionArea()}
+            {props.renderSideActionArea}
           </div>
         )}
 

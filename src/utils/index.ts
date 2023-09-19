@@ -95,7 +95,18 @@ export const ascendingSort =
   (a: T, b: T) =>
     itemProp(a) - itemProp(b)
 
-export function dq<K extends keyof HTMLElementTagNameMap>(selector: K) {
+export const dq: {
+  <K extends keyof HTMLElementTagNameMap>(
+    selectors: K
+  ): HTMLElementTagNameMap[K][]
+  <K extends keyof SVGElementTagNameMap>(
+    selectors: K
+  ): SVGElementTagNameMap[K][]
+  <K extends keyof MathMLElementTagNameMap>(
+    selectors: K
+  ): MathMLElementTagNameMap[K][]
+  <E extends Element = Element>(selectors: string): E[]
+} = (selector: string) => {
   return Array.from(document.querySelectorAll(selector))
 }
 export let dq1: {
