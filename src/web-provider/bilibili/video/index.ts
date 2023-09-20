@@ -14,7 +14,7 @@ import { dq1 } from '@root/utils'
 import AssParser from '@root/utils/AssParser'
 import { windowsOnceCall } from '@root/utils/decorator'
 import type { OrPromise } from '@root/utils/typeUtils'
-import WebProvider from '../webProvider'
+import WebProvider from '../../webProvider'
 import { initSideActionAreaRender } from './sider'
 
 export default class BilibiliVideoProvider extends WebProvider {

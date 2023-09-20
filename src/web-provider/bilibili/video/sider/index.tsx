@@ -35,21 +35,21 @@ export function initSideActionAreaRender(miniPlayer: DocMiniPlayer) {
       }
     }, [])
 
-    useEffect(() => {
-      if (!activeElRef.current) return
-      // TODO 可能是被style影响到了，进来时scrollContainerRef.current.clientHeight = 0，没法赋值scrollTop
-      setTimeout(() => {
-        scrollContainerRef.current.scrollTop = activeElRef.current.offsetTop
-        console.log(
-          'activeElRef.current',
-          activeElRef.current,
-          activeElRef.current.offsetTop,
-          scrollContainerRef.current,
-          scrollContainerRef.current.scrollTop,
-          scrollContainerRef.current.clientHeight
-        )
-      }, 0)
-    }, [activeElRef.current])
+    // useEffect(() => {
+    //   if (!activeElRef.current) return
+    //   // TODO 可能是被style影响到了，进来时scrollContainerRef.current.clientHeight = 0，没法赋值scrollTop
+    //   setTimeout(() => {
+    //     scrollContainerRef.current.scrollTop = activeElRef.current.offsetTop
+    //     console.log(
+    //       'activeElRef.current',
+    //       activeElRef.current,
+    //       activeElRef.current.offsetTop,
+    //       scrollContainerRef.current,
+    //       scrollContainerRef.current.scrollTop,
+    //       scrollContainerRef.current.clientHeight
+    //     )
+    //   }, 0)
+    // }, [activeElRef.current])
 
     return (
       <div className="side-outer-container">
