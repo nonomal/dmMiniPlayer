@@ -31,3 +31,15 @@ const Page_popup: FC = (props) => {
 }
 
 export default Page_popup
+
+let tab = await chrome.tabs.create({
+  url: 'https://www.baidu.com/',
+  pinned: true,
+})
+function func() {
+  window.documentPictureInPicture.requestWindow()
+}
+chrome.scripting.executeScript({
+  target: { tabId: tab.id },
+  func,
+})
