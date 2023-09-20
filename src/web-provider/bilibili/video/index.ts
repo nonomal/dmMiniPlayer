@@ -62,10 +62,6 @@ export default class BilibiliVideoProvider extends WebProvider {
     })
   }
 
-  protected getVideoEl(): OrPromise<HTMLVideoElement> {
-    return document.querySelector('video')
-  }
-
   protected async initMiniPlayer(
     options?: Partial<{ videoEl: HTMLVideoElement }>
   ): Promise<MiniPlayer> {

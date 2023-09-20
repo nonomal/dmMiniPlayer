@@ -48,10 +48,10 @@ export default abstract class WebProvider {
   }
 
   /**获取视频 */
-  protected getVideoEl(): OrPromise<HTMLVideoElement> {
+  getVideoEl(document = window.document): OrPromise<HTMLVideoElement> {
     const videos = [
-      ...dq('video'),
-      ...dq('iframe')
+      ...dq('video', document),
+      ...dq('iframe', document)
         .map((iframe) => {
           try {
             return Array.from(

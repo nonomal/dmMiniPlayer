@@ -1,17 +1,18 @@
 import { createElement } from '@root/utils'
+import type WebProvider from '@root/web-provider/webProvider'
 
 export default class VideoChanger {
   iframe = createElement<HTMLIFrameElement>('iframe', {
-    style: 'position:fixed;opacity: 0;bottom:0;right:0;pointer-events: none;',
-    width: '100%',
-    height: '100%',
+    style: `position:fixed;width:${window.innerWidth}px;height:${window.innerHeight}px;top:0;left:0;visibility: hidden;`,
   })
+  webProvider: WebProvider
 
-  constructor() {
+  constructor(webProvider: WebProvider) {
     document.body.appendChild(this.iframe)
+    this.webProvider = webProvider
   }
 
-  openUrl(url: string) {
+  protected openUrl(url: string) {
     return new Promise<void>((res) => {
       this.iframe.src = url
 
@@ -21,5 +22,14 @@ export default class VideoChanger {
       }
       this.iframe.addEventListener('load', handleOnLoad)
     })
+  }
+
+  async changeVideo(url: string) {
+    await this.openUrl(url)
+    const newWebVideoEl = await this.webProvider.getVideoEl(
+      this.iframe.contentDocument
+    )
+
+    this.webProvider.miniPlayer.updateWebVideoPlayerEl(newWebVideoEl)
   }
 }

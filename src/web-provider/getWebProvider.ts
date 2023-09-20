@@ -1,3 +1,4 @@
+import AgemysProvider from './agemys'
 import BilibiliLiveProvider from './bilibili/live'
 import BilibiliVideoProvider from './bilibili/video'
 import CCLiveProvider from './cc'
@@ -26,6 +27,10 @@ const providerList = [
   {
     reg: /https:\/\/ddys\.(art|pro)\/.*/,
     provider: DdrkProvider,
+  },
+  {
+    reg: /https:\/\/www\.(agemys\.org)|(age\.tv)|(agefans\.com)\/.*/,
+    provider: AgemysProvider,
   },
   {
     reg: /.*/,

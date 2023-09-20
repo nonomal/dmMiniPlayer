@@ -1,6 +1,6 @@
 import isEqual from 'fast-deep-equal'
 import type { CSSProperties } from 'react'
-import type { Rec } from './typeUtils'
+import type { Rec, ValueOf } from './typeUtils'
 
 let el: HTMLSpanElement = null
 
@@ -97,28 +97,39 @@ export const ascendingSort =
 
 export const dq: {
   <K extends keyof HTMLElementTagNameMap>(
-    selectors: K
+    selectors: K,
+    tar?: Document | ValueOf<HTMLElementTagNameMap> | Element
   ): HTMLElementTagNameMap[K][]
   <K extends keyof SVGElementTagNameMap>(
-    selectors: K
+    selectors: K,
+    tar?: Document | ValueOf<SVGElementTagNameMap> | Element
   ): SVGElementTagNameMap[K][]
   <K extends keyof MathMLElementTagNameMap>(
-    selectors: K
+    selectors: K,
+    tar?: Document | ValueOf<MathMLElementTagNameMap> | Element
   ): MathMLElementTagNameMap[K][]
-  <E extends Element = Element>(selectors: string): E[]
-} = (selector: string) => {
-  return Array.from(document.querySelectorAll(selector))
+  <E extends Element = HTMLDivElement>(
+    selectors: string,
+    tar?: Document | Element
+  ): E[]
+} = (selector: string, tar = window.document) => {
+  return Array.from(tar.querySelectorAll(selector))
 }
 export let dq1: {
-  <K extends keyof HTMLElementTagNameMap>(selectors: K):
-    | HTMLElementTagNameMap[K]
-    | null
-  <K extends keyof SVGElementTagNameMap>(selectors: K):
-    | SVGElementTagNameMap[K]
-    | null
-  <E extends Element = HTMLDivElement>(selectors: string): E | null
-} = (selector: string) => {
-  let dom = document.querySelector(selector)
+  <K extends keyof HTMLElementTagNameMap>(
+    selectors: K,
+    tar?: Document | ValueOf<HTMLElementTagNameMap> | Element
+  ): HTMLElementTagNameMap[K] | null
+  <K extends keyof SVGElementTagNameMap>(
+    selectors: K,
+    tar?: Document | ValueOf<SVGElementTagNameMap> | Element
+  ): SVGElementTagNameMap[K] | null
+  <E extends Element = HTMLDivElement>(
+    selectors: string,
+    tar?: Document | Element
+  ): E | null
+} = (selector: string, tar = window.document) => {
+  let dom = tar.querySelector(selector)
   return dom
 }
 
