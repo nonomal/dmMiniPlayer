@@ -10,7 +10,9 @@
 - [x] 斗鱼直播
 - [x] CC直播 (仅播放)
 - [x] 动画疯
-- [ ] 抖音直播
+- [x] 抖音直播
+- [x] twitch直播
+- [ ] 虎牙直播
 
 ## 主要实现方法
 ### 旧版本canvas版本
@@ -33,3 +35,4 @@
 - [douyu-monitor](https://github.com/qianjiachun/douyu-monitor)
 - [real-url](https://github.com/wbt5/real-url/blob/master/danmu/danmaku/cc.py)
 - [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
+- [huya_danmu](https://github.com/hwenjie/huya_danmu)
