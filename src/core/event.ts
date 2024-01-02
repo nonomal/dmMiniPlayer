@@ -5,15 +5,16 @@ export type CanvasPlayerEvent = {
   // [k in `cp:${keyof HTMLVideoElementEventMap}`]: void
 }
 
+export type VideoPlayerEvent = {
+  [k in `vp:${keyof HTMLVideoElementEventMap}`]: void
+}
 export type NativeCustomEvent = {
   /**关闭PIP窗口时 */
-  PIPClose: void
+  PIPClose: { time: number }
   PIPOpen: void
   play: void
   pause: void
   seek: void
 }
 
-export type PlayerEvents = NativeCustomEvent &
-  WebPlayerEvent &
-  CanvasPlayerEvent
+export type PlayerEvents = NativeCustomEvent & VideoPlayerEvent
