@@ -1,0 +1,71 @@
+.danmaku-container{
+  position: relative;
+  .danmaku-item,.danmaku-calc-item{
+    position: absolute;
+    width: 100%;
+    color: var(--color, #fff);
+    font-weight: var(--font-weight);
+    font-size: var(--font-size);
+    font-family: var(--font-family);
+    white-space: nowrap;
+  }
+  &.paused{
+    .danmaku-item,.danmaku-calc-item{
+      animation-play-state: paused !important;
+    }
+  }
+  .danmaku-item{
+    text-shadow: 1px 0 1px #000,0 1px 1px #000,0 -1px 1px #000,-1px 0 1px #000;
+    @keyframes danmaku-unmoving-state {
+      0%{
+        opacity: 1;
+      }
+      99%{
+        opacity: 1;
+      }
+      100%{
+        opacity: 0;
+      }
+    }
+    @keyframes danmaku-move {
+      0%{
+        transform: translateX(100%);
+      }
+      100%{
+        transform: translateX(var(--nwidth));
+      }
+    }
+
+    &.right{
+      top: calc((var(--gap) + var(--font-size)) * var(--tunnel));
+      transform: translateX(var(--nwidth));
+      animation: danmaku-move var(--duration) linear;
+    }
+    &.top{
+      top: calc((var(--gap) + var(--font-size)) * var(--tunnel));
+      text-align: center;
+      opacity: 0;
+      animation: danmaku-unmoving-state var(--duration) linear;
+    }
+    &.bottom{
+      bottom: calc((var(--gap) + var(--font-size)) * var(--tunnel));
+      text-align: center;
+      opacity: 0;
+      animation: danmaku-unmoving-state var(--duration) linear;
+    }
+  }
+  // 这个是用来触发out tunnel的动画用的
+  .danmaku-calc-item{
+    transform: translateX(0);
+    opacity: 0;
+    animation: danmaku-calc-move var(--duration) linear;
+    @keyframes danmaku-calc-move {
+      0%{
+        transform: translateX(var(--width));
+      }
+      100%{
+        transform: translateX(0);
+      }
+    }
+  }
+}

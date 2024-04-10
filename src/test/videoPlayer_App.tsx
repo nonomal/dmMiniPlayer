@@ -3,12 +3,15 @@ import BarrageSender from '@root/core/danmaku/BarrageSender'
 import { useOnce } from '@root/hook'
 import configStore, { openSettingPanel } from '@root/store/config'
 import { dq1 } from '@root/utils'
-import { useRef, useState, type FC } from 'react'
+import { CSSProperties, useRef, useState, type FC } from 'react'
 import './videoPlayer_App.less'
 import { listSelector } from '@root/utils/listSelector'
 import { runInAction } from 'mobx'
 import vpConfig from '@root/store/vpConfig'
 import parser from '@root/core/SubtitleManager/subtitleParser/srt'
+import '@root/core/danmaku/DanmakuManager/index.less'
+import DanmakuManager from '@root/core/danmaku/DanmakuManager'
+import { dans } from './data/dans'
 
 window.parser = parser
 window.listSelector = listSelector
@@ -35,6 +38,15 @@ const App = () => {
   const videoRef = useRef<HTMLVideoElement>(dq1('.video'))
   let [input, setInput] = useState('')
   const [editInput, setEditInput] = useState('edit')
+  const danmakuContainerRef = useRef<HTMLDivElement>()
+
+  useOnce(() => {
+    console.log('dm')
+    const dm = new DanmakuManager()
+    window.dm = dm
+    dm.addDanmakus(dans)
+    dm.init({ media: videoRef.current, container: danmakuContainerRef.current })
+  })
 
   useOnce(() => {
     const sender = new BarrageSender({
@@ -62,6 +74,10 @@ const App = () => {
 
   return (
     <div ref={ref}>
+      <div
+        ref={danmakuContainerRef}
+        className="danmaku-container w-[300px] h-[100px] bg-blue-400"
+      ></div>
       <div style={{ height: 200 }}>
         <VideoPlayer
           index={1}
