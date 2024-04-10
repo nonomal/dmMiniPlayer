@@ -47,6 +47,7 @@ export default class DanmakuManager
     } & Partial<DanmakuConfig>
   ) {
     Object.assign(this, props)
+    this.container.classList.add('danmaku-container')
     this.container.appendChild(this.style)
 
     this.updateState()

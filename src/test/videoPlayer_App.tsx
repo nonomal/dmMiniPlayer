@@ -76,7 +76,7 @@ const App = () => {
     <div ref={ref}>
       <div
         ref={danmakuContainerRef}
-        className="danmaku-container w-[300px] h-[100px] bg-blue-400"
+        className="!fixed w-full h-full left-0 top-0"
       ></div>
       <div style={{ height: 200 }}>
         <VideoPlayer
