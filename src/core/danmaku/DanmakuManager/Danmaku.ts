@@ -2,9 +2,12 @@ import { addEventListener, createElement, getTextWidth } from '@root/utils'
 import { DanmakuInitData, DanmakuMoveType } from './types'
 import { v1 as uuid } from 'uuid'
 import DanmakuManager from '.'
-import { logFn } from '@root/utils/decorator'
+import classNames from 'classnames'
 
-type InitProps = {}
+IntersectionObserver
+type InitProps = {
+  initTime?: number
+}
 export default class Danmaku implements DanmakuInitData {
   id: string
   color: string
@@ -13,44 +16,59 @@ export default class Danmaku implements DanmakuInitData {
   type: DanmakuMoveType
   width: number
   tunnel: number
+  /**实际init的time，用来video seek用的 */
+  initTime: number
 
   initd = false
   outTunnel = false
 
   disabled = false
 
-  container: HTMLElement
-  el = createElement('div', {
-    className: 'danmaku-item',
-  })
-  calcEl = createElement('div', {
-    className: 'danmaku-calc-item',
-  })
+  get speed() {
+    return this.danmakuManager.speed
+  }
+
+  get container() {
+    return this.danmakuManager.container
+  }
+  // 弹幕el: text_<s></s>
+  // 通过用IntersectionObserver监听<s>是否enter或leave，占领/释放弹幕tunnel
+  // TODO 还需要解决缩放后一个tunnel还有2个以上变化到leave，第一个enter并leave，那第二个会跟新danmakus冲突的情况
+  el: HTMLElement
+  /**给tunnelManager监听 */
+  outTunnelObserveEl: HTMLSpanElement
 
   danmakuManager: DanmakuManager
 
   constructor(
     props: DanmakuInitData & {
-      container: HTMLElement
       danmakuManager: DanmakuManager
     }
   ) {
     props.id = props.id || uuid()
     Object.assign(this, props)
 
-    this.el.innerText = props.text
-    this.el.classList.add(this.type)
-    this.calcEl.innerText = props.text
+    this.outTunnelObserveEl = createElement('span')
+    this.el = createElement('div', {
+      className: `danmaku-item ${this.type}`,
+      innerText: props.text,
+      children: [this.outTunnelObserveEl],
+    })
   }
 
   init(props: InitProps) {
     if (this.initd) return
-    this.tunnel = this.danmakuManager.getTunnel(this.type)
-    this.container = this.danmakuManager.container
+
+    this.initTime = props.initTime || this.time
+
+    this.tunnel = this.danmakuManager.tunnelManager.getTunnel(this)
+    if (this.tunnel == -1) {
+      this.disabled = true
+      return
+    }
 
     this.updateState()
     this.container.appendChild(this.el)
-    this.container.appendChild(this.calcEl)
 
     this.danmakuManager.emit('danmaku-enter', this)
     this.bindEvent()
@@ -67,18 +85,9 @@ export default class Danmaku implements DanmakuInitData {
             this.onLeave()
           })
         })
-        const unbind2 = addEventListener(this.calcEl, (el) => {
-          el.addEventListener('animationend', () => {
-            this.outTunnel = true
-            // console.log('outTunnel', this)
-            this.danmakuManager.emit('danmaku-leaveTunnel', this)
-            this.danmakuManager.popTunnel(this.type, this.tunnel)
-          })
-        })
 
         this.unbindEvent = () => {
           unbind1()
-          unbind2()
         }
         break
       }
@@ -90,7 +99,7 @@ export default class Danmaku implements DanmakuInitData {
             this.outTunnel = true
             // console.log('outTunnel', this)
             this.danmakuManager.emit('danmaku-leaveTunnel', this)
-            this.danmakuManager.popTunnel(this.type, this.tunnel)
+            this.danmakuManager.tunnelManager.popTunnel(this)
             this.danmakuManager.emit('danmaku-leave', this)
             this.onLeave()
           })
@@ -104,49 +113,53 @@ export default class Danmaku implements DanmakuInitData {
 
   updateState() {
     const w = getTextWidth(this.text, {
-      fontSize: this.danmakuManager.fontSize,
+      fontSize: this.danmakuManager.fontSize + 'px',
       fontFamily: this.danmakuManager.fontFamily,
       fontWeight: this.danmakuManager.fontWeight,
     })
     this.width = w
 
     const cw = this.container.clientWidth
-    console.log('this.tunnel', this.tunnel)
-    this.el.style.setProperty('--tunnel', this.tunnel + '')
-    this.el.style.setProperty('--color', this.color)
-    switch (this.type) {
-      case 'right': {
-        const t = (cw + w) / this.danmakuManager.speed
-        const calcT = w / this.danmakuManager.speed
+    const initTimeOffset = this.initTime - this.time
 
-        this.el.style.setProperty('--nwidth', -1 * w + 'px')
-        this.el.style.setProperty('--duration', t + 's')
-        this.calcEl.style.setProperty('--width', w + 'px')
-        this.calcEl.style.setProperty('--duration', calcT + 's')
-        break
-      }
-      case 'bottom':
-      case 'top': {
-        this.el.style.setProperty(
-          '--duration',
-          this.danmakuManager.unmovingDanmakuSaveTime + 's'
-        )
-        break
-      }
+    let duration = this.danmakuManager.unmovingDanmakuSaveTime - initTimeOffset,
+      offset = cw - initTimeOffset * this.speed,
+      translateX = 0
+    if (this.type == 'right') {
+      duration = (offset + w) / this.speed
+      translateX = (offset + w) * -1
     }
+
+    // 设置el的property
+    const propertyData = {
+      color: this.color,
+      // 对应的css var
+      offset: offset + 'px',
+      width: this.width + 'px',
+      translateX: translateX + 'px',
+      tunnel: this.tunnel,
+      duration: duration + 's',
+      fontSize: this.danmakuManager.fontSize + 'px',
+      // offsetY:
+      //   this.tunnel * this.danmakuManager.fontSize +
+      //   this.tunnel * this.danmakuManager.gap,
+    }
+    Object.entries(propertyData).forEach(([key, val]) => {
+      this.el.style.setProperty(`--${key}`, val + '')
+    })
   }
 
   onLeave() {
     this.danmakuManager.emit('danmaku-leave', this)
-    this.resetState()
+    this.reset()
   }
-  resetState() {
+  reset() {
+    if (!this.initd) return
     this.initd = false
     this.outTunnel = false
     this.disabled = false
     this.unbindEvent()
 
     this.container.removeChild(this.el)
-    this.container.removeChild(this.calcEl)
   }
 }

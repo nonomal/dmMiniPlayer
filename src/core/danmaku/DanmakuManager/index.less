@@ -1,23 +1,46 @@
 .danmaku-container{
+  --gap: 4px;
+  --opacity: 1;
+  --color: #fff;
+  --font-weight: 600;
+  --font-family: 'Segoe UI Emoji, SimHei, "microsoft yahei", sans-serif';
+
   position: relative;
   pointer-events: none;
-  .danmaku-item,.danmaku-calc-item{
-    position: absolute;
-    width: 100%;
-    color: var(--color, #fff);
-    font-weight: var(--font-weight);
-    font-size: var(--font-size);
-    font-family: var(--font-family);
-    white-space: nowrap;
-  }
   &.paused{
-    .danmaku-item,.danmaku-calc-item{
+    .danmaku-item{
       animation-play-state: paused !important;
     }
   }
   .danmaku-item{
+    // 初始位置，视频的容器宽度
+    --offset: 0;
+    // 弹幕的宽度
+    --width: 0;
+    // (弹幕的宽度 + 视频的容器宽度) * -1
+    --translateX: 0;
+    --tunnel: 0;
+    // 与danSpeed translateX一起计算出来的
+    --duration: 0;
+    --font-size: 14px;
+    // --offsetY: 0;
+    --offsetY: calc(var(--tunnel) * var(--gap) + var(--font-size) * var(--tunnel));
+
+    position: absolute;
+    color: var(--color);
+    font-weight: var(--font-weight);
+    font-size: var(--font-size);
+    font-family: var(--font-family);
+    white-space: nowrap;
+    text-align: center;
     text-shadow: 1px 0 1px #000,0 1px 1px #000,0 -1px 1px #000,-1px 0 1px #000;
-    @keyframes danmaku-unmoving-state {
+    transform: translateZ(0);
+    perspective: 500px;
+    opacity: var(--opacity);
+    // will-change: transform;
+
+    // top和bottom用的
+    @keyframes danmaku-unmoving {
       0%{
         opacity: 1;
       }
@@ -28,45 +51,36 @@
         opacity: 0;
       }
     }
+
     @keyframes danmaku-move {
       0%{
-        transform: translateX(100%);
+        transform: translateX(0) translateZ(0);
       }
       100%{
-        transform: translateX(var(--nwidth));
+        transform: translateX(var(--translateX)) translateZ(0);
       }
     }
 
     &.right{
-      top: calc((var(--gap) + var(--font-size)) * var(--tunnel));
-      transform: translateX(var(--nwidth));
+      top: var(--offsetY);
+      left: var(--offset);
       animation: danmaku-move var(--duration) linear;
     }
     &.top{
-      top: calc((var(--gap) + var(--font-size)) * var(--tunnel));
+      top: var(--offsetY);
+      left: 50%;
       text-align: center;
+      transform: translateX(-50%) translateZ(0);
       opacity: 0;
-      animation: danmaku-unmoving-state var(--duration) linear;
+      animation: danmaku-unmoving var(--duration) linear;
     }
     &.bottom{
-      bottom: calc((var(--gap) + var(--font-size)) * var(--tunnel));
+      bottom: var(--offsetY);
+      left: 50%;
       text-align: center;
+      transform: translateX(-50%) translateZ(0);
       opacity: 0;
-      animation: danmaku-unmoving-state var(--duration) linear;
-    }
-  }
-  // 这个是用来触发out tunnel的动画用的
-  .danmaku-calc-item{
-    transform: translateX(0);
-    opacity: 0;
-    animation: danmaku-calc-move var(--duration) linear;
-    @keyframes danmaku-calc-move {
-      0%{
-        transform: translateX(var(--width));
-      }
-      100%{
-        transform: translateX(0);
-      }
+      animation: danmaku-unmoving var(--duration) linear;
     }
   }
 }

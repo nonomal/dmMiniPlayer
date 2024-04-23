@@ -12,8 +12,12 @@ import { addEventListener, readTextFromFile } from '@root/utils'
 import srtParser from './subtitleParser/srt'
 import vpConfig from '@root/store/vpConfig'
 import assParser from './subtitleParser/ass'
+import { PlayerComponent } from '../types'
 
-abstract class SubtitleManager extends Events2<SubtitleManagerEvents> {
+abstract class SubtitleManager
+  extends Events2<SubtitleManagerEvents>
+  implements PlayerComponent
+{
   subtitleItems: SubtitleItem[] = []
 
   video: HTMLVideoElement
@@ -40,7 +44,14 @@ abstract class SubtitleManager extends Events2<SubtitleManagerEvents> {
   init(video: HTMLVideoElement) {
     this.reset()
     this.video = video
+
+    this.onInit()
   }
+  onInit() {}
+  unload() {
+    this.onUnload()
+  }
+  onUnload() {}
 
   addSubtitle(label: string, rows: SubtitleRow[]) {
     this.subtitleItems.push({ label, value: label })

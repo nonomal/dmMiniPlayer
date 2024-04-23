@@ -12,6 +12,7 @@ import parser from '@root/core/SubtitleManager/subtitleParser/srt'
 import '@root/core/danmaku/DanmakuManager/index.less'
 import DanmakuManager from '@root/core/danmaku/DanmakuManager'
 import { dans } from './data/dans'
+import CanvasVideo from '@root/core/CanvasVideo'
 
 window.parser = parser
 window.listSelector = listSelector
@@ -39,13 +40,22 @@ const App = () => {
   let [input, setInput] = useState('')
   const [editInput, setEditInput] = useState('edit')
   const danmakuContainerRef = useRef<HTMLDivElement>()
+  const video2ref = useRef<HTMLVideoElement>(null)
 
-  useOnce(() => {
+  useOnce(async () => {
     console.log('dm')
     const dm = new DanmakuManager()
     window.dm = dm
     dm.addDanmakus(dans)
     dm.init({ media: videoRef.current, container: danmakuContainerRef.current })
+
+    // captureStream() 需要用户信任操作才能用
+    await new Promise((res) => (window.onclick = res))
+    const canvasVideo = new CanvasVideo({ videoEl: videoRef.current })
+    window.canvasVideo = canvasVideo
+    video2ref.current.srcObject = canvasVideo.canvasVideoStream
+    video2ref.current.play()
+    document.body.appendChild(canvasVideo.canvas)
   })
 
   useOnce(() => {
@@ -74,6 +84,7 @@ const App = () => {
 
   return (
     <div ref={ref}>
+      <video ref={video2ref} />
       <div
         ref={danmakuContainerRef}
         className="!fixed w-full h-full left-0 top-0"

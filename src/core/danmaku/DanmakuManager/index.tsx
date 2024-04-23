@@ -3,6 +3,7 @@ import { DanmakuInitData, DanmakuManagerEvents, DanmakuMoveType } from './types'
 import { addEventListener, createElement } from '@root/utils'
 import style from './index.less?inline'
 import Danmaku from './Danmaku'
+import TunnelManager from './TunnelManager'
 
 type DanmakuConfig = {
   speed: number
@@ -22,8 +23,7 @@ export default class DanmakuManager
   container: HTMLElement = createElement('div', {
     className: 'danmaku-container',
   })
-  tunnelsMap: { [key in DanmakuMoveType]: boolean[] }
-  maxTunnel = 100
+  tunnelManager = new TunnelManager(this)
 
   style = createElement('style', {
     innerHTML: style,
@@ -36,6 +36,10 @@ export default class DanmakuManager
   unmovingDanmakuSaveTime = 5
   gap = 4
 
+  // seek + 第一次进入视频时确定startIndex位置
+  hasSeek = true
+  offsetStartTime = 10
+
   constructor() {
     super()
     this.reset()
@@ -46,6 +50,7 @@ export default class DanmakuManager
       media: HTMLMediaElement
     } & Partial<DanmakuConfig>
   ) {
+    this.reset()
     Object.assign(this, props)
     this.container.classList.add('danmaku-container')
     this.container.appendChild(this.style)
@@ -70,37 +75,50 @@ export default class DanmakuManager
         this.container.classList.remove('paused')
       })
       el.addEventListener('pause', () => {
+        console.log('video pause', this.container)
         this.container.classList.add('paused')
       })
-      el.addEventListener('seeked', () => {
-        this.resetDanmakuState()
+      el.addEventListener('seeking', () => {
+        console.log('video seeked')
+        this.danmakus.forEach((d) => d.reset())
+        this.tunnelManager.resetTunnelsMap()
+        this.hasSeek = true
+        this.nowPos = 0
       })
       el.addEventListener('timeupdate', () => {
+        if (!this.danmakus.length) return
+        // 重制nowPos位置
         const ctime = el.currentTime
+        const toRunDanmakus: Danmaku[] = []
         while (this.nowPos < this.danmakus.length) {
           const danmaku = this.danmakus[this.nowPos]
           const startTime = danmaku.time
-          if (startTime >= ctime) {
+          if (startTime > ctime) {
             break
           }
-          this.runningDanmakus.push(danmaku)
+          if (startTime > ctime - this.offsetStartTime) {
+            toRunDanmakus.push(danmaku)
+          }
           ++this.nowPos
         }
         const disableKeys: number[] = []
-        for (const key in this.runningDanmakus) {
-          const danmaku = this.runningDanmakus[key]
-          danmaku.init({ speed: 20 })
+        for (const key in toRunDanmakus) {
+          const danmaku = toRunDanmakus[key]
+          danmaku.init({
+            initTime: this.hasSeek ? ctime : null,
+          })
           if (danmaku.initd) {
             disableKeys.unshift(+key)
           }
         }
-        disableKeys.forEach((key) => {
-          this.runningDanmakus.splice(key, 1)
-        })
+        this.runningDanmakus = toRunDanmakus.filter((d) => d.initd)
+
+        this.hasSeek = false
       })
     })
 
     this.unbindEvent = () => {
+      console.log('unbindEvent')
       mediaUnbind()
     }
   }
@@ -110,46 +128,18 @@ export default class DanmakuManager
       ...danmakus.map((dan) => {
         return new Danmaku({
           ...dan,
-          container: this.container,
           danmakuManager: this,
         })
       })
     )
   }
 
+  resetState() {
+    this.tunnelManager.resetTunnelsMap()
+  }
   reset() {
+    this.resetState()
     this.danmakus.length = 0
-    this.resetDanmakuState()
     this.unbindEvent()
-  }
-
-  resetDanmakuState() {
-    this.tunnelsMap = {
-      bottom: [],
-      right: [],
-      top: [],
-    }
-  }
-
-  getTunnel(type: DanmakuMoveType) {
-    const find = this.tunnelsMap[type].findIndex((v) => v)
-    if (find != -1) {
-      this.tunnelsMap[type][find] = false
-      return find > this.maxTunnel ? -1 : find
-    }
-    this.tunnelsMap[type].push(false)
-    const tunnel = this.tunnelsMap[type].length - 1
-    return tunnel > this.maxTunnel ? -1 : tunnel
-  }
-  pushTunnel(type: DanmakuMoveType) {
-    const find = this.tunnelsMap[type].findIndex((v) => v)
-    if (find != -1) {
-      this.tunnelsMap[type][find] = false
-      return
-    }
-    this.tunnelsMap[type].push(false)
-  }
-  popTunnel(type: DanmakuMoveType, tunnel: number) {
-    this.tunnelsMap[type][tunnel] = true
   }
 }
