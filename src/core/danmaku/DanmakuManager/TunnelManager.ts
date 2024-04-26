@@ -23,12 +23,13 @@ export default class TunnelManager {
   constructor(public danmakuManager: DanmakuManager) {}
 
   observeMovingDanmakuOutTunnel(danmaku: Danmaku) {
+    if (danmaku.tunnel == -1) return
     // 只监听会动的弹幕，其他不需要
     if (danmaku.type != 'right') return
     this.observerMap.set(danmaku.outTunnelObserveEl, danmaku)
     this.observer.observe(danmaku.outTunnelObserveEl)
   }
-  onMovingDanmakuOutTunnel(danmaku: Danmaku) {
+  protected onMovingDanmakuOutTunnel(danmaku: Danmaku) {
     this.observer.unobserve(danmaku.outTunnelObserveEl)
     this.observerMap.delete(danmaku.outTunnelObserveEl)
     danmaku.outTunnel = true
@@ -57,9 +58,6 @@ export default class TunnelManager {
   getTunnel(danmaku: Danmaku) {
     const type = danmaku.type
     const rsTunnel = this._getTunnel(danmaku)
-    if (rsTunnel != -1) {
-      this.observeMovingDanmakuOutTunnel(danmaku)
-    }
     return rsTunnel
   }
   /**@deprecated */

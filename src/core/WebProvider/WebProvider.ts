@@ -5,6 +5,10 @@ import DanmakuManager from '../danmaku/DanmakuManager'
 import MiniPlayer from '../MiniPlayer/MiniPlayer'
 import { dq } from '@root/utils'
 import { CanvasWebProvider, DocWebProvider } from '.'
+import { PlayerEvent } from '../event'
+import { MaxTunnelType } from '@root/store/config/danmaku'
+import videoRender from '@root/store/videoRender'
+import { autorun } from 'mobx'
 
 export default abstract class WebProvider {
   videoChanger: VideoChanger
@@ -40,15 +44,41 @@ export default abstract class WebProvider {
   }
 
   private initd?: boolean
-  /**打开画中画播放器 */
-  openPIPPlayer(props?: { videoEl?: HTMLVideoElement }) {
+  /**打开播放器 */
+  async openPlayer(props?: { videoEl?: HTMLVideoElement }) {
     const initData = this.onInit()
     if (initData) {
       Object.assign(this, initData)
     }
     this.webVideo = props?.videoEl ?? this.getVideoEl()
 
-    this.onOpenPIPPlayer()
+    await this.onOpenPlayer()
+
+    // 监听
+    const unlistens = [
+      this.miniPlayer.on2(PlayerEvent.resize, this.onResize),
+      autorun(this.onResize),
+    ]
+    // 卸载监听
+    this.miniPlayer.on2(PlayerEvent.close, () => {
+      unlistens.forEach((fn) => fn())
+    })
+  }
+
+  onResize() {
+    const { maxTunnel, gap, fontSize } = configStore
+    const renderHeight = this.miniPlayer.height
+
+    this.danmakuManager.tunnelManager.maxTunnel = (() => {
+      switch (maxTunnel) {
+        case MaxTunnelType['1/2']:
+          return renderHeight / 2 / (+fontSize + +gap)
+        case MaxTunnelType['1/4']:
+          return renderHeight / 4 / (+fontSize + +gap)
+        case MaxTunnelType['full']:
+          return 100
+      }
+    })()
   }
 
   /**获取视频 */
@@ -79,5 +109,5 @@ export default abstract class WebProvider {
     return targetVideo
   }
 
-  onOpenPIPPlayer(): Promise<void> | void {}
+  onOpenPlayer(): Promise<void> | void {}
 }

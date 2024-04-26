@@ -63,21 +63,21 @@ export default class MiniPlayer {
     })
 
     // 设置maxTunnel
-    autorun(() => {
-      const { maxTunnel, gap, fontSize } = configStore
-      const { containerHeight: renderHeight } = videoRender
+    // autorun(() => {
+    //   const { maxTunnel, gap, fontSize } = configStore
+    //   const { containerHeight: renderHeight } = videoRender
 
-      this.danmakuController.tunnelManager.maxTunnel = (() => {
-        switch (maxTunnel) {
-          case MaxTunnelType['1/2']:
-            return renderHeight / 2 / (+fontSize + +gap)
-          case MaxTunnelType['1/4']:
-            return renderHeight / 4 / (+fontSize + +gap)
-          case MaxTunnelType['full']:
-            return 100
-        }
-      })()
-    })
+    //   this.danmakuController.tunnelManager.maxTunnel = (() => {
+    //     switch (maxTunnel) {
+    //       case MaxTunnelType['1/2']:
+    //         return renderHeight / 2 / (+fontSize + +gap)
+    //       case MaxTunnelType['1/4']:
+    //         return renderHeight / 4 / (+fontSize + +gap)
+    //       case MaxTunnelType['full']:
+    //         return 100
+    //     }
+    //   })()
+    // })
 
     autorun(() => {
       this.danmakuController.fontSize = configStore.fontSize

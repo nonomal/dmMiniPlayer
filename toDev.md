@@ -20,7 +20,16 @@ class BilibiliProvider extends WebProvider {
   - 只管获取对应网站的侧边信息，传给SideManager
   - 只管获取对应网站的字幕列表，传给SubtitleManager
 ### 暴露方法
-- openPIPPlayer: 负责打开miniPlayer的PIP
+- openPlayer: 负责打开miniPlayer的player
+
+### 衍生子类
+定义怎么打开播放器
+
+这个在`继承时`，自动切换`prototype`成对应的衍生子类
+
+- DocPIPWebProvider:      使用docPIP API打开播放器
+- PIPWebProvider:         使用原生PIP API打开播放器
+- ReplacerWebProvider:    替换 + 覆盖网站的web videoEl
 
 ## MiniPlayer
 ### 负责功能

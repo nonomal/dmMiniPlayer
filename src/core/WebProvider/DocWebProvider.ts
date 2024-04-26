@@ -6,6 +6,7 @@ import DocMiniPlayer from '../MiniPlayer/DocMiniPlayer'
 import { getPIPWindowConfig } from '@root/utils/storage'
 import configStore, { videoBorderType } from '@root/store/config'
 import { createElement } from '@root/utils'
+import { PlayerEvent } from '../event'
 
 export default class DocWebProvider extends WebProvider {
   onInit(): Partial<{
@@ -20,8 +21,8 @@ export default class DocWebProvider extends WebProvider {
 
   pipWindow: Window
 
-  openPIPPlayer(): void {
-    super.openPIPPlayer()
+  async openPlayer() {
+    super.openPlayer()
     this.miniPlayer = new DocMiniPlayer({
       webVideoEl: this.webVideo,
       danmakuManager: this.danmakuManager,
@@ -30,7 +31,7 @@ export default class DocWebProvider extends WebProvider {
     })
   }
 
-  async onOpenPIPPlayer() {
+  async onOpenPlayer() {
     // 获取应该有的docPIP宽高
     const pipWindowConfig = await getPIPWindowConfig()
     let width = pipWindowConfig?.width ?? this.webVideo.clientWidth,
@@ -59,9 +60,13 @@ export default class DocWebProvider extends WebProvider {
       height,
     })
     this.pipWindow = pipWindow
-    // docPIP特有的关闭时间
+
+    // 挂载事件
     pipWindow.addEventListener('pagehide', () => {
-      this.miniPlayer.emit('PIPClose')
+      this.miniPlayer.emit(PlayerEvent.close)
+    })
+    pipWindow.addEventListener('resize', () => {
+      this.miniPlayer.emit(PlayerEvent.resize)
     })
 
     const playerEl = await this.miniPlayer.getPlayerEl()

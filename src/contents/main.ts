@@ -51,7 +51,7 @@ onMessage('start-PIP', (data) => {
   const provider = new NewBilibiliVideoProvider()
   window.provider = provider
 
-  provider.openPIPPlayer({ videoEl: data.videoEl })
+  provider.openPlayer({ videoEl: data.videoEl })
 })
 
 try {

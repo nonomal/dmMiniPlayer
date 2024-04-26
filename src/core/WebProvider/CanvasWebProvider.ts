@@ -15,7 +15,7 @@ export default class CanvasWebProvider extends WebProvider {
 
   protected miniPlayer: CanvasMiniPlayer
 
-  openPIPPlayer(): void {
-    super.openPIPPlayer()
+  async openPlayer() {
+    super.openPlayer()
   }
 }

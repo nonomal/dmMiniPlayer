@@ -1,8 +1,7 @@
-export type WebPlayerEvent = {
-  // [k in `wp:${keyof HTMLVideoElementEventMap}`]: void
-}
-export type CanvasPlayerEvent = {
-  // [k in `cp:${keyof HTMLVideoElementEventMap}`]: void
+export enum PlayerEvent {
+  close = 'close',
+  open = 'open',
+  resize = 'resize',
 }
 
 export type NativeCustomEvent = {
@@ -12,8 +11,10 @@ export type NativeCustomEvent = {
   play: void
   pause: void
   seek: void
+  aaa: void
+} & {
+  // - 新的事件
+  [key in PlayerEvent]: void
 }
 
-export type PlayerEvents = NativeCustomEvent &
-  WebPlayerEvent &
-  CanvasPlayerEvent
+export type PlayerEvents = NativeCustomEvent
