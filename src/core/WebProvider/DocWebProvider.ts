@@ -66,6 +66,8 @@ export default class DocWebProvider extends WebProvider {
       this.miniPlayer.emit(PlayerEvent.close)
     })
     pipWindow.addEventListener('resize', () => {
+      this.miniPlayer.width = pipWindow.innerWidth
+      this.miniPlayer.height = pipWindow.innerHeight
       this.miniPlayer.emit(PlayerEvent.resize)
     })
 

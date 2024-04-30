@@ -87,7 +87,6 @@ export default class DanmakuManager
       })
       el.addEventListener('timeupdate', () => {
         if (!this.danmakus.length) return
-        // 重制nowPos位置
         const ctime = el.currentTime
         const toRunDanmakus: Danmaku[] = []
         while (this.nowPos < this.danmakus.length) {
@@ -102,13 +101,65 @@ export default class DanmakuManager
           ++this.nowPos
         }
         const disableKeys: number[] = []
+        // 这里只计算type:right的弹幕位置
+        const rightDanOccupyWidthMap: Record<number, number> = {}
+
         for (const key in toRunDanmakus) {
           const danmaku = toRunDanmakus[key]
-          danmaku.init({
-            initTime: this.hasSeek ? ctime : null,
-          })
+          danmaku.init({ initTime: this.hasSeek ? ctime : null })
           if (danmaku.initd) {
             disableKeys.unshift(+key)
+          } else {
+            continue
+          }
+
+          // hasSeek下不需要处理非right的弹幕
+          if (this.hasSeek && danmaku.type != 'right') {
+            this.tunnelManager.observeMovingDanmakuOutTunnel(danmaku)
+            continue
+          }
+
+          // 处理seek的弹幕
+          // 根据长度判断是否要监听退出tunnel事件
+          if (this.hasSeek) {
+            // 不要tunnelManager的tunnel，自己计算一套tunnel再占领tunnelsMap位置
+            this.tunnelManager.popTunnel(danmaku)
+
+            const { width } = danmaku,
+              offsetTime = ctime - danmaku.time,
+              speed = this.speed
+
+            const movedX = speed * offsetTime
+
+            const startX = this.container.clientWidth - movedX,
+              occupyRight = startX + width
+
+            let toTunnel = 0
+            while (true) {
+              if (!rightDanOccupyWidthMap[toTunnel]) {
+                rightDanOccupyWidthMap[toTunnel] = occupyRight
+                break
+              }
+              if (rightDanOccupyWidthMap[toTunnel] < startX) {
+                rightDanOccupyWidthMap[toTunnel] = occupyRight
+                break
+              }
+              toTunnel++
+            }
+            if (toTunnel > this.tunnelManager.maxTunnel) {
+              danmaku.reset()
+              continue
+            }
+
+            // 这里是渲染时就在屏幕外，就占用一个tunnel通道
+            if (occupyRight >= this.container.clientWidth) {
+              this.tunnelManager.tunnelsMap.right[toTunnel] = danmaku
+              this.tunnelManager.observeMovingDanmakuOutTunnel(danmaku)
+            }
+            danmaku.tunnel = toTunnel
+            danmaku.updateState()
+          } else {
+            this.tunnelManager.observeMovingDanmakuOutTunnel(danmaku)
           }
         }
         this.runningDanmakus = toRunDanmakus.filter((d) => d.initd)

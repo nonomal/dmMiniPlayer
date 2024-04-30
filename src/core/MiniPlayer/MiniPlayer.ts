@@ -29,8 +29,8 @@ export default abstract class MiniPlayer
   videoChanger: VideoChanger
   subtitleManager: SubtitleManager
   danmakuManager: DanmakuManager
-  height: number
-  width: number
+  height = 0
+  width = 0
 
   constructor(props: MiniPlayerProps) {
     super()
