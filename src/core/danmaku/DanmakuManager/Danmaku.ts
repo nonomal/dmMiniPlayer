@@ -139,7 +139,7 @@ export default class Danmaku implements DanmakuInitData {
       translateX: translateX + 'px',
       tunnel: this.tunnel,
       duration: duration + 's',
-      fontSize: this.danmakuManager.fontSize + 'px',
+      'font-size': this.danmakuManager.fontSize + 'px',
       // offsetY:
       //   this.tunnel * this.danmakuManager.fontSize +
       //   this.tunnel * this.danmakuManager.gap,
