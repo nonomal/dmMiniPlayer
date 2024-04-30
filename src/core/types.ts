@@ -1,4 +1,4 @@
-export type PlayerComponent = {
+export interface PlayerComponent {
   onInit: (...args: any[]) => any
   onUnload: (...args: any[]) => any
   init: (...args: any[]) => any

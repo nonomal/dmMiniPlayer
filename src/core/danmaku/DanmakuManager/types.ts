@@ -5,7 +5,7 @@ export type DanmakuMoveType = 'top' | 'right' | 'bottom'
 export type DanmakuInitData = {
   id?: string
   text: string
-  time: number
+  time?: number
   color: string
   type: DanmakuMoveType
 }
