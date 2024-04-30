@@ -65,8 +65,8 @@ devDependencies:
     specifier: ^1.0.5
     version: 1.0.5
   '@apad/vite-plugin':
-    specifier: 2.0.2
-    version: 2.0.2
+    specifier: 2.0.1
+    version: 2.0.1
   '@babel/plugin-proposal-decorators':
     specifier: ^7.22.10
     version: 7.24.1(@babel/core@7.24.3)
@@ -211,8 +211,8 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@apad/vite-plugin@2.0.2:
-    resolution: {integrity: sha512-Qvs0ygIAm9sYkly3UdgkqV+ggcOgOtdAWkZqLCsWYRvPVO7icvszqV6R8KF8gaEQEESBN05//svir+210/8jAg==}
+  /@apad/vite-plugin@2.0.1:
+    resolution: {integrity: sha512-8LU28L6Og+CrviNPcjj7S8tmuJX81xqgXa2mBkMU27Rdr/pOTVFnbo5jEWUbDm+bT9fmjkfK1tjWJfKrP+VrUA==}
     dependencies:
       '@rollup/pluginutils': 4.2.1
       '@webcomponents/custom-elements': 1.6.0

@@ -57,7 +57,9 @@ export default abstract class WebProvider {
     // 监听
     const unlistens = [
       this.miniPlayer.on2(PlayerEvent.resize, this.onResize),
-      autorun(this.onResize),
+      autorun(() => {
+        this.onResize()
+      }),
     ]
     // 卸载监听
     this.miniPlayer.on2(PlayerEvent.close, () => {
@@ -79,6 +81,12 @@ export default abstract class WebProvider {
           return 100
       }
     })()
+
+    console.log(
+      'this.danmakuManager.tunnelManager.maxTunnel',
+      this.danmakuManager.tunnelManager.maxTunnel,
+      renderHeight
+    )
   }
 
   /**获取视频 */

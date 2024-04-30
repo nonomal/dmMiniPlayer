@@ -1,4 +1,4 @@
-import WebProvider from './WebProvider'
+import { WebProvider } from '.'
 import SubtitleManager from '../SubtitleManager'
 import VideoChanger from '../VideoChanger'
 import DanmakuManager from '../danmaku/DanmakuManager'
