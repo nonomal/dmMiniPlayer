@@ -53,36 +53,6 @@ export default abstract class WebProvider {
     this.webVideo = props?.videoEl ?? this.getVideoEl()
 
     await this.onOpenPlayer()
-
-    // 监听
-    const unlistens = [
-      this.miniPlayer.on2(PlayerEvent.resize, () => {
-        this.onResize()
-      }),
-      autorun(() => {
-        this.onResize()
-      }),
-    ]
-    // 卸载监听
-    this.miniPlayer.on2(PlayerEvent.close, () => {
-      unlistens.forEach((fn) => fn())
-    })
-  }
-
-  onResize() {
-    const { maxTunnel, gap, fontSize } = configStore
-    const renderHeight = this.miniPlayer.height
-
-    this.danmakuManager.tunnelManager.maxTunnel = (() => {
-      switch (maxTunnel) {
-        case MaxTunnelType['1/2']:
-          return renderHeight / 2 / (+fontSize + +gap)
-        case MaxTunnelType['1/4']:
-          return renderHeight / 4 / (+fontSize + +gap)
-        case MaxTunnelType['full']:
-          return 100
-      }
-    })()
   }
 
   /**获取视频 */

@@ -1,9 +1,12 @@
 import Events2 from '@root/utils/Events2'
-import { DanmakuInitData, DanmakuManagerEvents, DanmakuMoveType } from './types'
-import { addEventListener, createElement } from '@root/utils'
+import { DanmakuInitData, DanmakuManagerEvents } from './types'
+import { addEventListener, createElement, noop } from '@root/utils'
 import style from './index.less?inline'
 import Danmaku from './Danmaku'
 import TunnelManager from './TunnelManager'
+import { autorun } from 'mobx'
+import { makeKeysObservable } from '@root/utils/mobx'
+import { PlayerComponent } from '@root/core/types'
 
 type DanmakuConfig = {
   speed: number
@@ -15,7 +18,7 @@ type DanmakuConfig = {
 }
 export default class DanmakuManager
   extends Events2<DanmakuManagerEvents>
-  implements DanmakuConfig
+  implements DanmakuConfig, PlayerComponent
 {
   danmakus: Danmaku[] = []
 
@@ -35,6 +38,8 @@ export default class DanmakuManager
   fontWeight = 600
   unmovingDanmakuSaveTime = 5
   gap = 4
+  opacity = 1
+  fontShadow = true
 
   // seek + 第一次进入视频时确定startIndex位置
   hasSeek = true
@@ -43,6 +48,31 @@ export default class DanmakuManager
   constructor() {
     super()
     this.reset()
+
+    makeKeysObservable(this, [
+      'speed',
+      'fontSize',
+      'fontFamily',
+      'fontWeight',
+      'unmovingDanmakuSaveTime',
+      'gap',
+      'opacity',
+      'fontShadow',
+    ])
+  }
+
+  onInit(
+    props: {
+      container?: HTMLElement
+      media: HTMLMediaElement
+    } & Partial<DanmakuConfig>
+  ) {}
+  onUnload() {
+    this.reset()
+    this.unlistens.forEach((unlisten) => unlisten())
+  }
+  unload() {
+    this.onUnload()
   }
   init(
     props: {
@@ -50,20 +80,28 @@ export default class DanmakuManager
       media: HTMLMediaElement
     } & Partial<DanmakuConfig>
   ) {
+    this.onInit(props)
     this.reset()
     Object.assign(this, props)
     this.container.classList.add('danmaku-container')
     this.container.appendChild(this.style)
 
-    this.updateState()
+    const confUnlisten = autorun(() => {
+      this.updateState()
+    })
     this.bindEvent()
+
+    this.unlistens = [confUnlisten]
   }
+
+  private unlistens: noop[] = []
 
   updateState() {
     this.container.style.setProperty('--font-size', this.fontSize + 'px')
     this.container.style.setProperty('--gap', this.gap + 'px')
     this.container.style.setProperty('--font-weight', this.fontWeight + '')
     this.container.style.setProperty('--font-family', this.fontFamily)
+    this.container.style.setProperty('--opacity', this.opacity + '')
   }
 
   private runningDanmakus: Danmaku[] = []
