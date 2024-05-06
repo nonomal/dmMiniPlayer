@@ -33,6 +33,8 @@ export default class CanvasDanmakuManager extends DanmakuManager {
       width: this.container.clientWidth,
       height: this.container.clientHeight,
     })
+
+    this.container.appendChild(this.canvas)
   }
   onUnload(): void {}
 
@@ -146,6 +148,6 @@ export default class CanvasDanmakuManager extends DanmakuManager {
       danmaku.draw(videoCTime)
       topTunnel++
     }
-    this.tunnelManager.tunnelsMap = { ...this.tunnelManager.tunnelsMap, top }
+    this.tunnelManager.tunnelsMap.top = top
   }
 }

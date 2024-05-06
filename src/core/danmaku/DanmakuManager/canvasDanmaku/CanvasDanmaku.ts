@@ -38,6 +38,8 @@ export default class CanvasDanmaku extends Danmaku {
       this.endTime = this.startTime + 30
     }
 
+    const canvas = this.danmakuManager.canvas
+
     this.autorun(() => {
       this.width = getTextWidth(this.text, {
         fontSize: this.danmakuManager.fontSize + 'px',
@@ -49,7 +51,6 @@ export default class CanvasDanmaku extends Danmaku {
       }
     })
 
-    const canvas = this.danmakuManager.canvas
     if (this.type != 'right') {
       this.autorun(() => {
         this.x = (canvas.width - this.width) / 2 / window.devicePixelRatio

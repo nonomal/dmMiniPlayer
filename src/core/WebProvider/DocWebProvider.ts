@@ -83,6 +83,7 @@ export default class DocWebProvider extends WebProvider {
         width: '100%',
         height: '100%',
         overflow: 'hidden',
+        pointerEvents: 'none',
       },
     })
     playerEl.appendChild(danmakuContainer)

@@ -4,7 +4,9 @@ export default class TunnelManager {
   tunnelsMap: { [key in DanmakuMoveType]: Danmaku[] }
   maxTunnel = 100
 
-  constructor(public danmakuManager: DanmakuManager) {}
+  constructor(public danmakuManager: DanmakuManager) {
+    this.resetTunnelsMap()
+  }
 
   private _getTunnel(danmaku: Danmaku) {
     const type = danmaku.type
