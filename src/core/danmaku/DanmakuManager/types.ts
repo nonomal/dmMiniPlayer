@@ -1,4 +1,4 @@
-import Danmaku from './Danmaku'
+import { Danmaku } from './'
 
 export type DanmakuMoveType = 'top' | 'right' | 'bottom'
 

@@ -22,6 +22,7 @@ export default class CanvasVideo implements Required<Props> {
   ctx = this.canvas.getContext('2d')
   private animationFrameSignal: number
   isPause = true
+  hasSeek = false
 
   fpsInterval = 0
 
@@ -70,6 +71,9 @@ export default class CanvasVideo implements Required<Props> {
 
         this.updateSize()
         this.startRenderAsCanvas()
+      })
+      videoEl.addEventListener('seeked', () => {
+        this.hasSeek = true
       })
     })
   }
@@ -122,7 +126,7 @@ export default class CanvasVideo implements Required<Props> {
   startRenderAsCanvas() {
     try {
       this.animationFrameSignal = requestAnimationFrame(() =>
-        this.canvasUpdate()
+        this.frameUpdate()
       )
       return true
     } catch (error) {
@@ -137,17 +141,15 @@ export default class CanvasVideo implements Required<Props> {
   }
 
   protected withoutLimitLastUpdateTime = Date.now()
-  protected withoutLimitAnimaFPS = 0
+  withoutLimitAnimaFPS = 0
   protected hansDraw = false
-  protected canvasUpdate(force = false) {
+  protected frameUpdate(force = false) {
     if (force || (this.fps != 0 ? this.checkFPSLimit() : true)) {
-      const videoEl = this.videoEl
-
       if (force || !this.isPause || !this.hansDraw) {
         this.hansDraw = true
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        this.ctx.drawImage(videoEl, this.x, this.y, this.width, this.height)
+        this.drawCanvas()
         this.detectFPS()
       }
     }
@@ -161,7 +163,11 @@ export default class CanvasVideo implements Required<Props> {
     this.withoutLimitLastUpdateTime = now
 
     this.inUpdateFrame = false
-    this.animationFrameSignal = requestAnimationFrame(() => this.canvasUpdate())
+    this.animationFrameSignal = requestAnimationFrame(() => this.frameUpdate())
+  }
+
+  drawCanvas() {
+    this.ctx.drawImage(this.videoEl, this.x, this.y, this.width, this.height)
   }
 
   // TODO 检测视频FPS

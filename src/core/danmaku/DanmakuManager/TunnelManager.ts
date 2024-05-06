@@ -1,43 +1,10 @@
-import DanmakuManager from '.'
-import Danmaku from './Danmaku'
-import { DanmakuMoveType } from './types'
+import { DanmakuManager, Danmaku, DanmakuMoveType } from '.'
 
 export default class TunnelManager {
   tunnelsMap: { [key in DanmakuMoveType]: Danmaku[] }
   maxTunnel = 100
-  observerMap = new Map<HTMLSpanElement, Danmaku>()
-  observer = new IntersectionObserver((entries) => {
-    // 监听danmaku后面那个span进入页面，然后触发onDanmakuOutTunnel
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return
-      const target = entry.target as HTMLSpanElement
-      const danmaku = this.observerMap.get(target)
-      if (danmaku) {
-        this.onMovingDanmakuOutTunnel(danmaku)
-      } else {
-        console.error('发现不存在observerMap但在监听的danmaku', target)
-      }
-    })
-  })
 
   constructor(public danmakuManager: DanmakuManager) {}
-
-  observeMovingDanmakuOutTunnel(danmaku: Danmaku) {
-    if (danmaku.tunnel == -1) return
-    // 只监听会动的弹幕，其他不需要
-    if (danmaku.type != 'right') return
-    this.observerMap.set(danmaku.outTunnelObserveEl, danmaku)
-    this.observer.observe(danmaku.outTunnelObserveEl)
-  }
-  protected onMovingDanmakuOutTunnel(danmaku: Danmaku) {
-    this.observer.unobserve(danmaku.outTunnelObserveEl)
-    this.observerMap.delete(danmaku.outTunnelObserveEl)
-    danmaku.outTunnel = true
-    if (this.popTunnel(danmaku)) {
-      // ? 这里要不要从穿个参数表示是旧的observer的
-      danmaku.danmakuManager.emit('danmaku-leaveTunnel', danmaku)
-    }
-  }
 
   private _getTunnel(danmaku: Danmaku) {
     const type = danmaku.type
@@ -88,8 +55,6 @@ export default class TunnelManager {
   }
 
   unload() {
-    this.observer.disconnect()
-    this.observerMap.clear()
     this.resetTunnelsMap()
   }
 }
