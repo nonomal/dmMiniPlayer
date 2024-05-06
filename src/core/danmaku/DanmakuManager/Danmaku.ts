@@ -1,5 +1,4 @@
 import { PlayerComponent } from '@root/core/types'
-import { createElement } from '@root/utils'
 import { v1 as uuid } from 'uuid'
 import { DanmakuInitData, DanmakuManager, DanmakuMoveType } from './'
 
@@ -46,6 +45,11 @@ export default class Danmaku implements DanmakuInitData, PlayerComponent {
   ) {
     props.id = props.id || uuid()
     Object.assign(this, props)
+    if (this instanceof props.danmakuManager.Danmaku) {
+      return this
+    }
+
+    return new props.danmakuManager.Danmaku(props)
   }
   onInit(props: DanmakuInitProps) {}
   onUnload() {}

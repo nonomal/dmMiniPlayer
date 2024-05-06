@@ -37,8 +37,31 @@ export default abstract class MiniPlayer
     super()
     Object.assign(this, props)
     makeKeysObservable(this, ['height', 'width'])
+    this.init()
+  }
+
+  private unlistens: noop[] = []
+  private onResize() {
+    const { maxTunnel, gap, fontSize } = configStore
+    const renderHeight = this.height
+
+    this.danmakuManager.tunnelManager.maxTunnel = (() => {
+      switch (maxTunnel) {
+        case MaxTunnelType['1/2']:
+          return renderHeight / 2 / (+fontSize + +gap)
+        case MaxTunnelType['1/4']:
+          return renderHeight / 4 / (+fontSize + +gap)
+        case MaxTunnelType['full']:
+          return 100
+      }
+    })()
+  }
+
+  onUnload() {}
+  init() {
     this.onInit()
 
+    console.log('init')
     // 弹幕设置
     const danConfUnlisten = autorun(() => {
       this.danmakuManager.speed = configStore.danSpeed
@@ -82,28 +105,6 @@ export default abstract class MiniPlayer
       }),
     ]
     this.unlistens = [danConfUnlisten, danSizeUnlisten, ...resizeUnlistens]
-  }
-
-  private unlistens: noop[] = []
-  private onResize() {
-    const { maxTunnel, gap, fontSize } = configStore
-    const renderHeight = this.height
-
-    this.danmakuManager.tunnelManager.maxTunnel = (() => {
-      switch (maxTunnel) {
-        case MaxTunnelType['1/2']:
-          return renderHeight / 2 / (+fontSize + +gap)
-        case MaxTunnelType['1/4']:
-          return renderHeight / 4 / (+fontSize + +gap)
-        case MaxTunnelType['full']:
-          return 100
-      }
-    })()
-  }
-
-  onUnload() {}
-  init() {
-    this.onInit()
 
     this.on(PlayerEvent.close, () => {
       this.unload()

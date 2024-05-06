@@ -1,14 +1,10 @@
-import configStore, { videoBorderType } from '@root/store/config'
+import configStore from '@root/store/config'
 import SubtitleManager from '../SubtitleManager'
 import VideoChanger from '../VideoChanger'
 import DanmakuManager from '../danmaku/DanmakuManager'
 import MiniPlayer from '../MiniPlayer/MiniPlayer'
 import { dq } from '@root/utils'
 import { CanvasWebProvider, DocWebProvider } from '.'
-import { PlayerEvent } from '../event'
-import { MaxTunnelType } from '@root/store/config/danmaku'
-import videoRender from '@root/store/videoRender'
-import { autorun } from 'mobx'
 
 export default abstract class WebProvider {
   videoChanger: VideoChanger

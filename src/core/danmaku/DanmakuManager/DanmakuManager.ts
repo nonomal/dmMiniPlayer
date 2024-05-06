@@ -6,7 +6,10 @@ import {
   TunnelManager,
   DanmakuInitData,
   DanmakuManagerEvents,
+  HtmlDanmakuManager,
+  CanvasDanmakuManager,
 } from './'
+import configStore from '@root/store/config'
 
 type DanmakuConfig = {
   speed: number
@@ -25,6 +28,8 @@ export default class DanmakuManager
   extends Events2<DanmakuManagerEvents>
   implements DanmakuConfig, PlayerComponent
 {
+  /**弹幕在实例化时会new这个 */
+  Danmaku = Danmaku
   container: Element
   danmakus: Danmaku[] = []
 
@@ -46,6 +51,12 @@ export default class DanmakuManager
 
   constructor() {
     super()
+    if (
+      [HtmlDanmakuManager, CanvasDanmakuManager].find((v) => this instanceof v)
+    ) {
+      return this
+    }
+
     makeKeysObservable(this, [
       'speed',
       'fontSize',
@@ -56,6 +67,11 @@ export default class DanmakuManager
       'opacity',
       'fontShadow',
     ])
+    if (configStore.useHtmlDanmaku) {
+      return new HtmlDanmakuManager()
+    } else {
+      return new CanvasDanmakuManager()
+    }
   }
 
   onInit(props: DanmakuManagerInitProps) {}
@@ -65,8 +81,8 @@ export default class DanmakuManager
     this.onUnload()
   }
   init(props: DanmakuManagerInitProps) {
-    this.onInit(props)
     Object.assign(this, props)
+    this.onInit(props)
   }
 
   runningDanmakus: Danmaku[] = []

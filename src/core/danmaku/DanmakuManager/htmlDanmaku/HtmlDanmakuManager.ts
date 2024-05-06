@@ -6,6 +6,7 @@ import Danmaku from './HtmlDanmaku'
 import style from './index.less?inline'
 
 export default class HtmlDanmakuManager extends DanmakuManager {
+  Danmaku = Danmaku
   declare danmakus: Danmaku[]
   declare runningDanmakus: Danmaku[]
 
@@ -55,7 +56,7 @@ export default class HtmlDanmakuManager extends DanmakuManager {
     const confUnlisten = autorun(() => {
       this.updateState()
     })
-    this.bindEvent()
+    this.bindEvent(props.media)
     this.unlistens = [confUnlisten]
   }
   private unlistens: noop[] = []
@@ -76,8 +77,8 @@ export default class HtmlDanmakuManager extends DanmakuManager {
 
   private nowPos = 0
   private unbindEvent = () => {}
-  private bindEvent() {
-    const mediaUnbind = addEventListener(this.media, (el) => {
+  private bindEvent(media: HTMLMediaElement) {
+    const mediaUnbind = addEventListener(media, (el) => {
       el.addEventListener('play', () => {
         this.container.classList.remove('paused')
       })

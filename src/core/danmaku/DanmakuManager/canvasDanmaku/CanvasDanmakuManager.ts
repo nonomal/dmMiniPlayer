@@ -7,6 +7,7 @@ import { autorun } from 'mobx'
 import CanvasDanmakuVideo from './CanvasDanmakuVideo'
 
 export default class CanvasDanmakuManager extends DanmakuManager {
+  Danmaku = Danmaku
   declare danmakus: Danmaku[]
   declare runningDanmakus: Danmaku[]
 
