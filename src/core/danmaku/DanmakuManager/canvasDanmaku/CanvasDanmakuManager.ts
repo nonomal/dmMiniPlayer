@@ -57,6 +57,7 @@ export default class CanvasDanmakuManager extends DanmakuManager {
     const disableKeys: number[] = []
     for (const key in this.runningDanmakus) {
       const barrage = this.runningDanmakus[key]
+      barrage.init({})
       barrage.draw(videoCTime)
       if (barrage.disabled) {
         disableKeys.unshift(+key)

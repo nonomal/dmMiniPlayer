@@ -19,14 +19,20 @@ export default class CanvasDanmaku extends Danmaku {
 
   tunnelOuted = false
 
+  get speed() {
+    return super.speed / 10
+  }
+
+  constructor(props: ConstructorParameters<typeof Danmaku>[0]) {
+    super(props)
+    this.startTime = this.time
+  }
   onInit(props: DanmakuInitProps): void {
     this.tunnel = this.danmakuManager.tunnelManager.getTunnel(this)
     if (this.tunnel == -1) {
       this.disabled = true
       return
     }
-
-    this.startTime = this.time
 
     if (this.type == 'right') {
       this.autorun(() => {
@@ -72,10 +78,13 @@ export default class CanvasDanmaku extends Danmaku {
     }
 
     this.initd = true
-    this.autorun(() => [
-      (this.tunnel + 1) * this.danmakuManager.fontSize +
-        this.tunnel * this.danmakuManager.gap,
-    ])
+    this.autorun(() => {
+      this.y =
+        (this.tunnel + 1) * this.danmakuManager.fontSize +
+        this.tunnel * this.danmakuManager.gap
+
+      console.log('this.y', this.y, this)
+    })
     this.danmakuManager.emit('danmaku-enter', this)
   }
 

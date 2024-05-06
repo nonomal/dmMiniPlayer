@@ -9,7 +9,7 @@ import { listSelector } from '@root/utils/listSelector'
 import { runInAction } from 'mobx'
 import vpConfig from '@root/store/vpConfig'
 import parser from '@root/core/SubtitleManager/subtitleParser/srt'
-import '@root/core/danmaku/DanmakuManager/index.less'
+import '@root/core/danmaku/DanmakuManager/htmlDanmaku/index.less'
 import DanmakuManager from '@root/core/danmaku/DanmakuManager'
 import { dans } from './data/dans'
 import CanvasVideo from '@root/core/CanvasVideo'
@@ -46,8 +46,8 @@ const App = () => {
     console.log('dm')
     const dm = new DanmakuManager()
     window.dm = dm
-    dm.addDanmakus(dans)
     dm.init({ media: videoRef.current, container: danmakuContainerRef.current })
+    dm.addDanmakus(dans)
 
     // captureStream() 需要用户信任操作才能用
     await new Promise((res) => (window.onclick = res))
@@ -87,7 +87,7 @@ const App = () => {
       <video ref={video2ref} />
       <div
         ref={danmakuContainerRef}
-        className="!fixed w-full h-full left-0 top-0"
+        className="!fixed w-full h-full left-0 top-0 pointer-events-none"
       ></div>
       <div style={{ height: 200 }}>
         <VideoPlayer
