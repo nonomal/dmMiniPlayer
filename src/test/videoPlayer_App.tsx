@@ -13,6 +13,7 @@ import '@root/core/danmaku/DanmakuManager/htmlDanmaku/index.less'
 import DanmakuManager from '@root/core/danmaku/DanmakuManager'
 import { dans } from './data/dans'
 import CanvasVideo from '@root/core/CanvasVideo'
+import chalk from 'chalk'
 
 window.parser = parser
 window.listSelector = listSelector
@@ -48,6 +49,16 @@ const App = () => {
     window.dm = dm
     dm.init({ media: videoRef.current, container: danmakuContainerRef.current })
     dm.addDanmakus(dans)
+
+    dm.on('danmaku-leave', (danmaku) => {
+      console.log(chalk.red('danmaku-leave'), danmaku)
+    })
+    dm.on('danmaku-enter', (danmaku) => {
+      console.log(chalk.green('danmaku-enter'), danmaku)
+    })
+    dm.on('danmaku-leaveTunnel', (danmaku) => {
+      console.log(chalk.yellow('danmaku-leaveTunnel'), danmaku)
+    })
 
     // captureStream() 需要用户信任操作才能用
     await new Promise((res) => (window.onclick = res))

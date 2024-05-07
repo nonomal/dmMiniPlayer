@@ -19,6 +19,8 @@ export default class CanvasDanmaku extends Danmaku {
 
   tunnelOuted = false
 
+  drawSuccess = false
+
   get speed() {
     return super.speed / 10
   }
@@ -28,13 +30,14 @@ export default class CanvasDanmaku extends Danmaku {
     this.startTime = this.time
   }
   onInit(props: DanmakuInitProps): void {
+    if (this.initd) return
     this.tunnel = this.danmakuManager.tunnelManager.getTunnel(this)
     if (this.tunnel == -1) {
       this.disabled = true
       return
     }
 
-    if (this.type == 'right') {
+    if (this.type != 'right') {
       this.autorun(() => {
         this.endTime =
           this.startTime + this.danmakuManager.unmovingDanmakuSaveTime
@@ -82,10 +85,7 @@ export default class CanvasDanmaku extends Danmaku {
       this.y =
         (this.tunnel + 1) * this.danmakuManager.fontSize +
         this.tunnel * this.danmakuManager.gap
-
-      console.log('this.y', this.y, this)
     })
-    this.danmakuManager.emit('danmaku-enter', this)
   }
 
   private autorun(cb: noop) {
@@ -94,10 +94,20 @@ export default class CanvasDanmaku extends Danmaku {
   private unlistens: noop[] = []
 
   onUnload(): void {
-    this.danmakuManager.emit('danmaku-leave', this)
+    if (this.initd && this.drawSuccess) {
+      this.danmakuManager.emit('danmaku-leave', this)
+    }
     this.unlistens.forEach((unlisten) => unlisten())
     this.unlistens.length = 0
     this.reset()
+
+    if (this.type != 'right') {
+      this.danmakuManager.tunnelManager.popTunnel(this)
+    } else if (
+      this.danmakuManager.tunnelManager.tunnelsMap['right'][this.tunnel] == this
+    ) {
+      this.danmakuManager.tunnelManager.popTunnel(this)
+    }
   }
 
   reset(): void {
@@ -109,12 +119,13 @@ export default class CanvasDanmaku extends Danmaku {
     this.x = 0
     this.y = 0
     this.tunnel = 0
+    this.drawSuccess = false
   }
 
   /**给requestAnimationFrame用的 */
   draw(time: number) {
-    if (this.disabled) return
-    if (time < this.startTime) return
+    if (this.disabled) return this.unload()
+    if (time < this.startTime) return this.unload()
     if (this.endTime && (time < this.startTime || time > this.endTime)) {
       this.disabled = true
       this.unload()
@@ -145,6 +156,11 @@ export default class CanvasDanmaku extends Danmaku {
         }
         break
       }
+    }
+
+    if (!this.drawSuccess && !this.disabled) {
+      this.drawSuccess = true
+      this.danmakuManager.emit('danmaku-enter', this)
     }
 
     this.renderDanmaku()

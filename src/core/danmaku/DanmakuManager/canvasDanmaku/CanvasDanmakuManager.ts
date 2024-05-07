@@ -1,4 +1,4 @@
-import { createElement, noop } from '@root/utils'
+import { addEventListener, createElement, noop } from '@root/utils'
 import { DanmakuManager } from '../'
 import Danmaku from './CanvasDanmaku'
 import { DanmakuManagerInitProps } from '../DanmakuManager'
@@ -35,10 +35,23 @@ export default class CanvasDanmakuManager extends DanmakuManager {
     })
 
     this.container.appendChild(this.canvas)
+    this.bindEvent()
   }
-  onUnload(): void {}
+  private unlistens: noop[] = []
+  onUnload(): void {
+    this.unlistens.forEach((unlisten) => unlisten())
+  }
 
-  bindEvent() {}
+  bindEvent() {
+    // addEventListener(this.media, (video) => {
+    //   video.addEventListener('seeked', () => {
+    //     this.tunnelManager.resetTunnelsMap()
+    //     this.nowPos = 0
+    //     this.runningDanmakus.length = 0
+    //     this.danmakus.forEach((danmaku) => danmaku.unload())
+    //   })
+    // })
+  }
 
   private nowPos = 0
   // 绘制弹幕文本
@@ -61,6 +74,7 @@ export default class CanvasDanmakuManager extends DanmakuManager {
       barrage.draw(videoCTime)
       if (barrage.disabled) {
         disableKeys.unshift(+key)
+        barrage.unload()
       }
     }
     disableKeys.forEach((key) => {
@@ -69,7 +83,10 @@ export default class CanvasDanmakuManager extends DanmakuManager {
   }
   // 绘制第一帧的弹幕，在时间变动时需要用的
   drawInSeek() {
-    console.log('drawInSeek')
+    this.tunnelManager.resetTunnelsMap()
+    this.nowPos = 0
+    this.runningDanmakus.length = 0
+    this.danmakus.forEach((danmaku) => danmaku.unload())
     const offsetStartTime = 10
 
     const videoCTime = this.media.currentTime
@@ -88,9 +105,11 @@ export default class CanvasDanmakuManager extends DanmakuManager {
       } else {
         beforeOffsetTimeDans.push(barrage)
       }
+      ++this.nowPos
     }
-    dansToDraw.forEach((b) => {
-      b.init({ initTime: videoCTime })
+    dansToDraw.forEach((d) => {
+      d.init({ initTime: videoCTime })
+      this.tunnelManager.popTunnel(d)
     })
     rightDans.forEach((b) => {
       b.disabled = false
@@ -149,6 +168,7 @@ export default class CanvasDanmakuManager extends DanmakuManager {
       danmaku.draw(videoCTime)
       topTunnel++
     }
-    this.tunnelManager.tunnelsMap.top = top
+    this.tunnelManager.tunnelsMap = { ...this.tunnelManager.tunnelsMap, top }
+    this.runningDanmakus.push(...dansToDraw)
   }
 }

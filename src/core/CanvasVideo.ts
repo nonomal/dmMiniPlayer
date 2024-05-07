@@ -22,10 +22,11 @@ export default class CanvasVideo implements Required<Props> {
   ctx = this.canvas.getContext('2d')
   private animationFrameSignal: number
   isPause = true
-  hasSeek = false
+  hasSeek = true
 
   fpsInterval = 0
 
+  @onceCallGet
   get canvasVideoStream() {
     return this.canvas.captureStream()
   }
@@ -70,7 +71,6 @@ export default class CanvasVideo implements Required<Props> {
         this.height ??= this.videoEl.clientHeight
 
         this.updateSize()
-        this.startRenderAsCanvas()
       })
       videoEl.addEventListener('seeked', () => {
         this.hasSeek = true

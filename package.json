@@ -44,6 +44,7 @@
     "ahooks": "^3.7.8",
     "ass-compiler": "^0.1.11",
     "bilibili-live-ws": "^6.3.1",
+    "chalk": "^5.3.0",
     "classnames": "^2.3.2",
     "color": "^4.2.3",
     "fast-deep-equal": "^3.1.3",
