@@ -10,6 +10,7 @@ import configStore, { DocPIPRenderType } from '@root/store/config'
 import CanvasVideo from '../CanvasVideo'
 import { observeVideoEl } from '@root/utils/observeVideoEl'
 import { onVideoPlayerLoad } from '@root/components/VideoPlayer/events'
+import { PlayerEvent } from '../event'
 
 const styleEl = createElement('div', {
   className: 'style-list',
@@ -113,7 +114,7 @@ export default class DocMiniPlayer extends MiniPlayer {
     }
 
     await onVideoPlayerLoad()
-    this.on('PIPClose', () => {
+    this.on(PlayerEvent.close, () => {
       reactRoot.unmount()
       this.playerRootEl = null
       restoreWebVideoPlayerElState()

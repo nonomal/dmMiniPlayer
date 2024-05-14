@@ -6,8 +6,6 @@ export enum PlayerEvent {
 
 export type NativeCustomEvent = {
   /**关闭PIP窗口时 */
-  PIPClose: void
-  PIPOpen: void
   play: void
   pause: void
   seek: void

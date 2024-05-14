@@ -14,7 +14,7 @@ import vpConfig from '@root/store/vpConfig'
 import assParser from './subtitleParser/ass'
 import { PlayerComponent } from '../types'
 
-abstract class SubtitleManager
+class SubtitleManager
   extends Events2<SubtitleManagerEvents>
   implements PlayerComponent
 {
@@ -166,7 +166,9 @@ abstract class SubtitleManager
     vpConfig.showSubtitle = true
   }
 
-  abstract loadSubtitle(value: string): Promise<SubtitleRow[]>
+  async loadSubtitle(value: string): Promise<SubtitleRow[]> {
+    return []
+  }
 
   reset() {
     this.subtitleItems.length = 0

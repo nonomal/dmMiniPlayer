@@ -10,22 +10,11 @@ import MiniPlayer from '@root/core/MiniPlayer/MiniPlayer'
 export default class NewBilibiliVideoProvider extends WebProvider {
   protected miniPlayer: MiniPlayer
 
-  onInit(): Partial<{
-    videoChanger: VideoChanger
-    subtitleManager: SubtitleManager
-    danmakuManager: DanmakuManager
-  }> {
-    const danmakuManager = new DanmakuManager()
-
+  onInit() {
     ;(async () => {
       const { aid, cid } = await getVideoInfo(getBv(), getPid())
       const danmakus = await getBiliBiliVideoDanmu(cid)
-      danmakuManager.addDanmakus(danmakus)
+      this.danmakuManager.addDanmakus(danmakus)
     })()
-
-    return {
-      danmakuManager,
-      subtitleManager: new BilibiliSubtitleManager(),
-    }
   }
 }

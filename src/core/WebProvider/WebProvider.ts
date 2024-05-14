@@ -27,25 +27,20 @@ export default abstract class WebProvider {
     })()
 
     Object.setPrototypeOf(Object.getPrototypeOf(this), provider)
-    console.log('this', this)
     return this
   }
 
-  onInit(): Partial<{
-    videoChanger: VideoChanger
-    subtitleManager: SubtitleManager
-    danmakuManager: DanmakuManager
-  }> | null {
-    return null
+  init() {
+    this.danmakuManager = new DanmakuManager()
+    this.subtitleManager = new SubtitleManager()
+    this.onInit()
   }
+  onInit(): void {}
 
   private initd?: boolean
   /**打开播放器 */
   async openPlayer(props?: { videoEl?: HTMLVideoElement }) {
-    const initData = this.onInit()
-    if (initData) {
-      Object.assign(this, initData)
-    }
+    this.init()
     this.webVideo = props?.videoEl ?? this.getVideoEl()
 
     await this.onOpenPlayer()

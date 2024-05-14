@@ -40,6 +40,7 @@ export default class CanvasDanmakuManager extends DanmakuManager {
   private unlistens: noop[] = []
   onUnload(): void {
     this.unlistens.forEach((unlisten) => unlisten())
+    this.canvasDanmakuVideo.resizeObserver.disconnect()
   }
 
   bindEvent() {
