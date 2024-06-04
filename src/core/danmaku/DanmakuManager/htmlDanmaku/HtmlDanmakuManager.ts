@@ -187,4 +187,14 @@ export default class HtmlDanmakuManager extends DanmakuManager {
     this.danmakus.length = 0
     this.unbindEvent()
   }
+
+  changeVisible(visible?: boolean): void {
+    super.changeVisible(visible)
+
+    if (this.visible) {
+      this.container.style.display = undefined
+    } else {
+      this.container.style.display = 'hidden'
+    }
+  }
 }

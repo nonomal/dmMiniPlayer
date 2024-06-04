@@ -49,6 +49,10 @@ export default class DanmakuManager
   hasSeek = true
   offsetStartTime = 10
 
+  fps = 60
+
+  visible = true
+
   constructor() {
     super()
     if (
@@ -66,12 +70,18 @@ export default class DanmakuManager
       'gap',
       'opacity',
       'fontShadow',
+      'fps',
+      'visible',
     ])
     if (configStore.useHtmlDanmaku) {
       return new HtmlDanmakuManager()
     } else {
       return new CanvasDanmakuManager()
     }
+  }
+
+  changeVisible(visible?: boolean) {
+    this.visible = visible ?? !this.visible
   }
 
   onInit(props: DanmakuManagerInitProps) {}

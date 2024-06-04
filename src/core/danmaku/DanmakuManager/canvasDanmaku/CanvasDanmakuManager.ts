@@ -29,7 +29,7 @@ export default class CanvasDanmakuManager extends DanmakuManager {
     this.canvasDanmakuVideo = new CanvasDanmakuVideo({
       danmakuManager: this,
       videoEl: props.media as HTMLVideoElement,
-      fps: 60,
+      fps: this.fps,
       width: this.container.clientWidth,
       height: this.container.clientHeight,
     })
@@ -171,5 +171,17 @@ export default class CanvasDanmakuManager extends DanmakuManager {
     }
     this.tunnelManager.tunnelsMap = { ...this.tunnelManager.tunnelsMap, top }
     this.runningDanmakus.push(...dansToDraw)
+  }
+
+  private _opacity = 1
+  changeVisible(visible?: boolean): void {
+    super.changeVisible(visible)
+
+    if (this.visible) {
+      this.opacity = this._opacity
+    } else {
+      this._opacity = this.opacity
+      this.opacity = 0
+    }
   }
 }
