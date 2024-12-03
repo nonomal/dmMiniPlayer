@@ -23,9 +23,67 @@ import icon from '../../assets/icon.png'
 import ShadowRootContainer from './ShadowRootContainer'
 import { onPostMessage, postMessageToTop } from '@root/utils/windowMessages'
 import { sendMediaStreamInSender } from '@root/utils/webRTC'
-import { getIsZh } from '@root/utils/i18n'
+import { getIsZh, t } from '@root/utils/i18n'
 import env from '@root/shared/env'
-import { useReactBrowserLocalStorage } from '@root/hook/browserStorage'
+import useAutoPIPHandler from '@root/hook/useAutoPIPHandler'
+
+const VIDEO_ID_ATTR = 'data-dm-vid'
+
+export const postStartPIPDataMsg = async (
+  renderType: DocPIPRenderType,
+  videoEl: HTMLVideoElement
+) => {
+  const id = videoEl.getAttribute(VIDEO_ID_ATTR)!
+  const rect = videoEl.getBoundingClientRect()
+  const isRestriction =
+    renderType === DocPIPRenderType.capture_displayMediaWithRestrictionTarget
+
+  let restrictionTarget: RestrictionTarget | undefined
+
+  const isolateId = 'isolate-id'
+  if (
+    isRestriction &&
+    videoEl.parentElement &&
+    videoEl.parentElement.id !== isolateId
+  ) {
+    // restrictionTarget限制是isolation: isolate的元素
+    const container = createElement('div', {
+      style: {
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        isolation: 'isolate',
+      },
+      id: isolateId,
+    })
+    videoEl.parentElement.appendChild(container)
+    container.appendChild(videoEl)
+    restrictionTarget = await RestrictionTarget.fromElement(container)
+  }
+
+  postMessageToTop(PostMessageEvent.startPIPFromFloatButton, {
+    cropTarget:
+      renderType === DocPIPRenderType.capture_displayMediaWithCropTarget
+        ? await CropTarget.fromElement(videoEl)
+        : undefined,
+    restrictionTarget,
+    posData: {
+      x: rect.x,
+      y: rect.y,
+      w: rect.width,
+      h: rect.height,
+      vw: videoEl.videoWidth,
+      vh: videoEl.videoHeight,
+    },
+    videoState: {
+      id,
+      duration: videoEl.duration,
+      currentTime: videoEl.currentTime,
+      isPause: videoEl.paused,
+    },
+    renderType,
+  })
+}
 
 type Props = {
   container: HTMLElement
@@ -38,6 +96,10 @@ const FloatButton: FC<Props> = (props) => {
   const { container, vel, fixedPos } = props
 
   const videoRef = useRef<HTMLVideoElement>()
+  const [changeLog] = useState(() => {
+    const log = getIsZh() ? env.upgrade_zh : env.upgrade_en
+    return log || t('floatButton.smallUpdate')
+  })
 
   useOnce(() =>
     useBrowserSyncStorage(FLOAT_BTN_HIDDEN, (hidden) => {
@@ -57,12 +119,14 @@ const FloatButton: FC<Props> = (props) => {
   const [id] = useState(() => uuid())
 
   useOnce(() => {
-    vel.setAttribute('data-dm-vid', id)
+    vel.setAttribute(VIDEO_ID_ATTR, id)
 
     return () => {
-      vel.removeAttribute('data-dm-vid')
+      vel.removeAttribute(VIDEO_ID_ATTR)
     }
   })
+
+  useAutoPIPHandler(vel)
 
   // fixed会受到 transform、perspective、filter 或 backdrop-filter 影响上下文
   // @see https://developer.mozilla.org/zh-CN/docs/Web/CSS/position#fixed
@@ -132,59 +196,6 @@ const FloatButton: FC<Props> = (props) => {
     if (!videoEl) return
     videoRef.current = videoEl
 
-    const postCaptureModeDataMsg = async (renderType: DocPIPRenderType) => {
-      const rect = videoEl.getBoundingClientRect()
-      const isRestriction =
-        renderType ===
-        DocPIPRenderType.capture_displayMediaWithRestrictionTarget
-
-      let restrictionTarget: RestrictionTarget | undefined
-
-      const isolateId = 'isolate-id'
-      if (
-        isRestriction &&
-        videoEl.parentElement &&
-        videoEl.parentElement.id !== isolateId
-      ) {
-        // restrictionTarget限制是isolation: isolate的元素
-        const container = createElement('div', {
-          style: {
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-            isolation: 'isolate',
-          },
-          id: isolateId,
-        })
-        videoEl.parentElement.appendChild(container)
-        container.appendChild(videoEl)
-        restrictionTarget = await RestrictionTarget.fromElement(container)
-      }
-
-      postMessageToTop(PostMessageEvent.startPIPFromFloatButton, {
-        cropTarget:
-          renderType === DocPIPRenderType.capture_displayMediaWithCropTarget
-            ? await CropTarget.fromElement(videoEl)
-            : undefined,
-        restrictionTarget,
-        posData: {
-          x: rect.x,
-          y: rect.y,
-          w: rect.width,
-          h: rect.height,
-          vw: videoEl.videoWidth,
-          vh: videoEl.videoHeight,
-        },
-        videoState: {
-          id,
-          duration: videoEl.duration,
-          currentTime: videoEl.currentTime,
-          isPause: videoEl.paused,
-        },
-        renderType,
-      })
-    }
-
     // 检测可否访问top
     const [cannotAccessTop] = tryCatch(() => top!.document)
     if (cannotAccessTop) {
@@ -210,7 +221,7 @@ const FloatButton: FC<Props> = (props) => {
             break
         }
 
-        await postCaptureModeDataMsg(type)
+        await postStartPIPDataMsg(type, videoEl)
       })
 
       if (isErrorInOtherMode) {
@@ -232,12 +243,12 @@ const FloatButton: FC<Props> = (props) => {
     if (isInIframeVideo && isBlobSrc) {
       const type = configStore.sameOriginIframeCaptureModePriority
       console.log(`🟡 同源iframe，将启用其他模式 ${type}`)
-      postCaptureModeDataMsg(type)
+      postStartPIPDataMsg(type, videoEl)
       return true
     }
 
     // 如果都没用上面的模式，则走默认的设置的优先模式
-    postCaptureModeDataMsg(configStore.docPIP_renderType)
+    postStartPIPDataMsg(configStore.docPIP_renderType, videoEl)
     return true
   })
 
@@ -429,11 +440,31 @@ const FloatButton: FC<Props> = (props) => {
             {isUpgradeShow && (
               <>
                 <div className="absolute top-[-2px] right-[-2px] rounded-full wh-[8px] bg-red-500"></div>
-                <div className="absolute top-[calc(100%+4px)] max-w-[200px] w-max bg-bg overflow-hidden max-h-0 transition-all group-hover:max-h-[300px] text-[12px] rounded">
+                <div
+                  className={classNames(
+                    'absolute max-w-[200px] w-max bg-bg overflow-hidden max-h-0 transition-all group-hover:max-h-[300px] text-[12px] rounded',
+                    {
+                      'left-[--x] top-[--y]':
+                        configStore.floatButtonPos === FloatButtonPos.leftTop,
+                      'left-[--x] bottom-[--y]':
+                        configStore.floatButtonPos ===
+                        FloatButtonPos.leftBottom,
+                      'right-[--x] top-[--y]':
+                        configStore.floatButtonPos === FloatButtonPos.rightTop,
+                      'right-[--x] bottom-[--y]':
+                        configStore.floatButtonPos ===
+                        FloatButtonPos.rightBottom,
+                    }
+                  )}
+                  style={{
+                    '--y': 'calc(100% + 4px)',
+                    '--x': '0',
+                  }}
+                >
                   <div className="p-1 text-left whitespace-pre-line">
                     NEW:
                     <br />
-                    {getIsZh() ? env.upgrade_zh : env.upgrade_en}
+                    {changeLog}
                     <div className="f-i-center">
                       <div
                         className="ml-auto cursor-pointer bg-bg-hover px-1 rounded"
@@ -445,6 +476,7 @@ const FloatButton: FC<Props> = (props) => {
                             env.version
                           )
                           setUpgradeShow(false)
+                          isHoverLockRef.current = false
                         }}
                       >
                         OK

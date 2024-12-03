@@ -33,19 +33,18 @@ let toVersion =
   console.log(`修改changeLog文件 ${chalk.green('docs/changeLog.md')}`)
   // fs.openSync(pr('../docs/changeLog.md'), 'r')
 
+  packageData.version = version
+  await fs.writeJSON(pr('../package.json'), packageData, { spaces: 2 })
   const { confirm } = await enquirer.prompt([
     {
       type: 'confirm',
       name: 'confirm',
-      message: `release ${version} ?`,
+      message: `build ${version} ?`,
       initial: true,
     },
   ])
 
   if (!confirm) return
-
-  packageData.version = version
-  await fs.writeJSON(pr('../package.json'), packageData, { spaces: 2 })
   await spawn('npm', ['run', 'build'])
 
   // 打包zip
@@ -56,6 +55,17 @@ let toVersion =
   archive.directory(codeBuildOutDir, false)
 
   await archive.finalize()
+
+  const { release } = await enquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'release',
+      message: `release ${version} ?`,
+      initial: true,
+    },
+  ])
+
+  if (!release) return
 
   // git
   await spawn('git', ['add', '.'])

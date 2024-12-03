@@ -15,7 +15,7 @@ export const pr = (...p: any) => path.resolve(__dirname, ...p)
 export const tsconfig = pr('../tsconfig.json')
 export const outDir = pr('../dist')
 
-export const shareConfig: Parameters<typeof defineConfig>[0] = {
+export const shareConfig = {
   esbuildPlugins: [inlineImport({}), (esbuildMetaUrl as any)({})],
   esbuildOptions(options, ctx) {
     options.alias ??= {}
@@ -41,7 +41,7 @@ export const shareConfig: Parameters<typeof defineConfig>[0] = {
     // 包含player的cs
     main: pr('../src/contents/main.ts'),
     // 注入world: main的脚本
-    world: pr('../src/contents/inject.ts'),
+    inject: pr('../src/contents/inject.ts'),
     // 修改cs的clog脚本
     clogInject: pr('../src/contents/clogInject.ts'),
     // popup的脚本
@@ -87,14 +87,14 @@ export const shareConfig: Parameters<typeof defineConfig>[0] = {
       : '"development"',
     ...omit(
       getDefinesObject('dev', {
-        upgrade_en: getChangeLog(version).replaceAll('\n', '\\n'),
-        upgrade_zh: getChangeLog(version, 'zh').replaceAll('\n', '\\n'),
+        upgrade_en: getChangeLog(version)?.replaceAll('\n', '\\n'),
+        upgrade_zh: getChangeLog(version, 'zh')?.replaceAll('\n', '\\n'),
         version,
       }),
       ['____env____']
     ),
   },
   platform: 'browser',
-}
+} satisfies Parameters<typeof defineConfig>[0]
 
 export { manifest }

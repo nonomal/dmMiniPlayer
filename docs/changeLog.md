@@ -1,3 +1,11 @@
+## v0.6.17
+1. Fixed bilibili episode list not displayed in side
+2. Optimizing js injection files will cause some websites to fail to load.
+
+## v0.6.16
+1. Added auto PIP feature: in hiding/scrolling the page
+2. Fixed changeLog display position bug
+
 ## v0.6.15
 1. Add docPIP webRTC mode
 2. Fixed float button position not correct in single video container
