@@ -92,7 +92,13 @@
     "rightBottom": "Right bottom",
     "visible": "Visible",
     "disableSites": "Disable sites",
-    "disableSitesTips": "Support regex with format \"/regex/\""
+    "disableSitesTips": "Support regex with format \"/regex/\"",
+    "autoPIPInPageHide": "Auto PIP in page hide",
+    "autoPIPInPageHideDesc": "Only support unmuted video, and same origin iframe video",
+    "autoPIPInScroll": "Auto PIP in scroll",
+    "autoPIPInScrollDesc": "Scroll page until this video is invisible, then turn on PIP",
+    "showReplacerBtn": "Show replace video button",
+    "showReplacerBtnDesc": "Replace the video player in the web page with the extension video player"
   },
   "popup": {
     "tips": "Click on the web page to trigger picture-in-picture",
@@ -103,7 +109,8 @@
     "openSetting": "Open setting"
   },
   "floatButton": {
-    "closeTips": "You can reopen float button in extension menu"
+    "closeTips": "You can reopen float button in extension menu",
+    "smallUpdate": "Small update"
   },
   "vp": {
     "speed": "Speed >>",

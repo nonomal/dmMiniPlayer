@@ -92,7 +92,13 @@
     "rightBottom": "abajo derecho",
     "visible": "Si mostrar o no",
     "disableSites": "Deshabilitar sitios",
-    "disableSitesTips": "Admite expresiones regulares con formato \"/regex/\""
+    "disableSitesTips": "Admite expresiones regulares con formato \"/regex/\"",
+    "autoPIPInPageHide": "PIP automático en ocultar página",
+    "autoPIPInPageHideDesc": "Solo admite videos no silenciados y videos iframe del mismo origen",
+    "autoPIPInScroll": "PIP automático en desplazamiento",
+    "autoPIPInScrollDesc": "Desplácese por la página hasta que este video sea invisible, luego active PIP",
+    "showReplacerBtn": "Mostrar botón de reemplazo de video",
+    "showReplacerBtnDesc": "Reemplace el reproductor de video en la página web con el reproductor de video de extensión"
   },
   "popup": {
     "tips": "Debes hacer clic en la página siguiente para activar la reproducción de imagen en imagen",
@@ -103,7 +109,8 @@
     "openSetting": "Configuración abierta"
   },
   "floatButton": {
-    "closeTips": "Puedes volver a abrir el botón flotante en el menú de extensión"
+    "closeTips": "Puedes volver a abrir el botón flotante en el menú de extensión",
+    "smallUpdate": "Pequeña actualización"
   },
   "vp": {
     "speed": "Velocidad >>",

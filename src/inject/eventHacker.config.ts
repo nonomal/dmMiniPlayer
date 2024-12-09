@@ -2,9 +2,12 @@
 // @example https://github.com/apades/dmMiniPlayer/issues/11
 // 现在只提供需要注入的网址就行了
 
-export const eventHackerEnableSites = [
-  /https:\/\/live\.douyin\.com\/.*/,
-  /https:\/\/www\.twitch\.tv\/.*/,
-  /https:\/\/www\.youtube\.com\/.*/,
-  /https:\/\/www\.douyu\.com\/.*/,
-]
+import { DEFAULT_EVENT_INJECT_SITE } from '@root/shared/config'
+
+// import { ATTR_EVENT_INJECT_SITES } from '@root/shared/config'
+
+// export const eventHackerEnableSites = JSON.parse(
+//   atob(document.documentElement.getAttribute(ATTR_EVENT_INJECT_SITES) ?? '[]')
+// )
+
+export const eventHackerEnableSites = DEFAULT_EVENT_INJECT_SITE

@@ -28,6 +28,7 @@ import {
 import isPluginEnv from '@root/shared/isPluginEnv'
 import config_floatButton from './floatButton'
 import { isUndefined } from 'lodash-es'
+import { DEFAULT_EVENT_INJECT_SITE } from '@root/shared/config'
 
 export { DocPIPRenderType } from './docPIP'
 
@@ -35,6 +36,12 @@ export enum videoBorderType {
   default = 'default',
   width = 'width',
   height = 'height',
+}
+
+export enum ReplacerDbClickAction {
+  none = 'none',
+  fullScreen = 'fullScreen',
+  fullInWeb = 'fullInWeb',
 }
 
 export const baseConfigMap = {
@@ -176,11 +183,27 @@ export const baseConfigMap = {
   dragArea_cornerPercentW: config({ defaultValue: 30, notRecommended: true }),
   dragArea_cornerPercentH: config({ defaultValue: 30, notRecommended: true }),
   disable_sites: config({
-    defaultValue: [],
+    defaultValue: [] as string[],
     label: t('settingPanel.disableSites'),
     desc: t('settingPanel.disableSitesTips'),
   }),
+  // eventInject_sites: config({
+  //   defaultValue: DEFAULT_EVENT_INJECT_SITE,
+  //   notRecommended: true,
+  // }),
   ...docPIPConfig,
+  showReplacerBtn: config({
+    defaultValue: false,
+    label: t('settingPanel.showReplacerBtn'),
+    desc: t('settingPanel.showReplacerBtnDesc'),
+  }),
+  replacerDbClickAction: config<ReplacerDbClickAction>({
+    defaultValue: ReplacerDbClickAction.fullScreen,
+    type: 'group',
+    group: Object.values(ReplacerDbClickAction),
+    relateBy: 'showReplacerBtn',
+    relateByValue: true,
+  }),
 }
 
 export const {

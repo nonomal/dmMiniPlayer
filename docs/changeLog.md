@@ -1,3 +1,21 @@
+## v0.6.20
+Added the function of replacing web videos into extension players, which needs to be turned on in settings.
+
+## v0.6.19
+1. Fixed the issue of abnormal display of sidebar videos with episodes
+2. Save the danmaku visible settings
+
+## v0.6.18
+Fixed an issue where the previous version update caused abnormalities on some websites
+
+## v0.6.17
+1. Fixed bilibili episode list not displayed in side
+2. Optimizing js injection files will cause some websites to fail to load.
+
+## v0.6.16
+1. Added auto PIP feature: in hiding/scrolling the page
+2. Fixed changeLog display position bug
+
 ## v0.6.15
 1. Add docPIP webRTC mode
 2. Fixed float button position not correct in single video container

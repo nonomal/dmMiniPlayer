@@ -38,19 +38,19 @@ export const manifest: chrome.runtime.ManifestV3 = {
   },
   content_scripts: [
     {
-      js: ['assets/lib/before-init-main.js'],
+      js: ['before-init-main.js'],
       run_at: 'document_start',
       matches: ['<all_urls>'],
     },
     {
-      js: ['assets/lib/entry-world.js'],
+      js: ['world.js'],
       run_at: 'document_start',
       world: 'MAIN',
       matches: ['<all_urls>'],
     },
     {
       matches: ['<all_urls>'],
-      js: ['assets/lib/entry-all-frames.js'],
+      js: ['entry-all-frames.js'],
       run_at: 'document_end',
       all_frames: true,
     },

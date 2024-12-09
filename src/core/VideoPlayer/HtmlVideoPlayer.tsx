@@ -1,11 +1,15 @@
 import configStore, { DocPIPRenderType } from '@root/store/config'
-import { addEventListener, createElement, throttle } from '@root/utils'
+import {
+  addEventListener,
+  createElement,
+  throttle,
+  tryCatch,
+} from '@root/utils'
 import { ComponentProps } from 'react'
 import { createRoot } from 'react-dom/client'
 import CanvasVideo from '../CanvasVideo'
 import { PlayerEvent } from '../event'
-import VideoPlayerBase from './VideoPlayerBase'
-// import style from '@root/components/VideoPlayer/index.less?inline'
+import VideoPlayerBase, { supportOnVideoChangeTypes } from './VideoPlayerBase'
 import VideoPlayerV2, {
   VideoPlayerHandle,
 } from '@root/components/VideoPlayerV2'
@@ -15,15 +19,6 @@ import WebextEvent from '@root/shared/webextEvent'
 import { getMediaStreamInGetter } from '@root/utils/webRTC'
 import playerConfig from '@root/store/playerConfig'
 
-const styleEl = createElement('div', {
-  className: 'style-list',
-  children: [
-    createElement('link', {
-      rel: 'stylesheet',
-      href: Browser.runtime.getURL('/css.css'),
-    }),
-  ],
-})
 const docPIPStyleEl = createElement('style', {
   innerText: 'html, body { height: 100% }',
 })
@@ -76,7 +71,7 @@ export class HtmlVideoPlayer extends VideoPlayerBase {
     })
     this.playerRootEl = createElement('div', {
       className: 'h-full',
-      children: [root, styleEl, docPIPStyleEl],
+      children: [root, docPIPStyleEl],
     })
     const reactRoot = createRoot(root)
 
@@ -101,6 +96,8 @@ export class HtmlVideoPlayer extends VideoPlayerBase {
       switch (renderMode) {
         case DocPIPRenderType.replaceVideoEl:
           return <VideoPlayerV2 {...commonProps} useWebVideo />
+        case DocPIPRenderType.replaceWebVideoDom:
+          return <VideoPlayerV2 {...commonProps} useWebVideo isReplacerMode />
         case DocPIPRenderType.capture_captureStreamWithCanvas:
           return (
             <VideoPlayerV2
@@ -209,11 +206,7 @@ export class HtmlVideoPlayer extends VideoPlayerBase {
 
     reactRoot.render(playerComponent)
 
-    const supportOnVideoChange = [
-      DocPIPRenderType.replaceVideoEl,
-      DocPIPRenderType.capture_captureStreamWithCanvas,
-      DocPIPRenderType.capture_captureStream,
-    ].includes(renderMode)
+    const supportOnVideoChange = supportOnVideoChangeTypes.includes(renderMode)
 
     this.on(PlayerEvent.webVideoChanged, (newVideoEl) => {
       console.log('observeVideoElChange', newVideoEl)
@@ -221,6 +214,7 @@ export class HtmlVideoPlayer extends VideoPlayerBase {
 
       if (!supportOnVideoChange) return
       switch (renderMode) {
+        case DocPIPRenderType.replaceWebVideoDom:
         case DocPIPRenderType.replaceVideoEl: {
           vpRef.updateVideo(newVideoEl)
           // 控制要不要把上一个还原
@@ -257,14 +251,18 @@ export class HtmlVideoPlayer extends VideoPlayerBase {
     // 用来把video元素还原回原本位置的方法
     let restoreWebVideoPlayerElState = () => {}
 
-    if (renderMode === DocPIPRenderType.replaceVideoEl) {
+    if (
+      renderMode === DocPIPRenderType.replaceVideoEl ||
+      renderMode === DocPIPRenderType.replaceWebVideoDom
+    ) {
       restoreWebVideoPlayerElState = this.initWebVideoPlayerElState(
         this.webVideoEl
       )
     }
 
     this.on(PlayerEvent.close, () => {
-      reactRoot.unmount()
+      // ReplacerWebProvider里套的一层container root unmount好像会传染到这个组件？这里再unmount会报错
+      tryCatch(() => reactRoot.unmount())
       this.playerRootEl = undefined
       restoreWebVideoPlayerElState()
       this.unloadPreCanvasVideoStream()

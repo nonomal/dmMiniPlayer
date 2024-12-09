@@ -67,9 +67,29 @@ export enum DocPIPRenderType {
    * 该模式是针对目标video不在同源iframe中设计的
    */
   injectMediaSource = 'injectMediaSource',
+
+  replaceWebVideoDom = 'replaceWebVideoDom',
+}
+
+export enum AutoPIPPos {
+  default = 'default',
+  'top-left' = 'top-left',
+  'top-right' = 'top-right',
+  'bottom-left' = 'bottom-left',
+  'bottom-right' = 'bottom-right',
 }
 
 export const docPIPConfig = {
+  autoPIP_inPageHide: config({
+    label: t('settingPanel.autoPIPInPageHide'),
+    defaultValue: false,
+    desc: t('settingPanel.autoPIPInPageHideDesc'),
+  }),
+  autoPIP_inScrollToInvisible: config({
+    label: t('settingPanel.autoPIPInScroll'),
+    defaultValue: false,
+    desc: t('settingPanel.autoPIPInScrollDesc'),
+  }),
   useDocPIP: config({
     defaultValue: !!window?.documentPictureInPicture,
     label: t('settingPanel.useDocPIP'),
@@ -106,6 +126,7 @@ export const docPIPConfig = {
         value: DocPIPRenderType.capture_captureStreamWithWebRTC,
         label: t('settingPanel.captureStreamWithWebRTC'),
       },
+      DocPIPRenderType.replaceWebVideoDom,
       // DocPIPRenderType.injectMediaSource,
     ],
     relateBy: 'useDocPIP',
@@ -154,22 +175,25 @@ export const docPIPConfig = {
       // DocPIPRenderType.injectMediaSource,
     ],
   }),
-  // capture_tabCapture_FPS: config({
-  //   label: 'Record FPS',
-  //   defaultValue: 30,
-  //   desc: 'Warning: The higher the FPS, the higher the CPU usage, and browser may crash',
-  //   relateBy: 'notSameOriginIframeCaptureModePriority',
-  //   relateByValue: DocPIPRenderType.capture_tabCapture,
-  // }),
-  // capture_tabCapture_clip: config({
-  //   label: 'Record clip',
-  //   defaultValue: false,
-  //   desc: 'Warning: Consuming performance very much',
-  //   relateBy: 'notSameOriginIframeCaptureModePriority',
-  //   relateByValue: DocPIPRenderType.capture_tabCapture,
-  // }),
-  // capture_captureStream_autoSetCrossOrigin: config({
-  //   label: 'Auto set video crossOrigin',
-  //   defaultValue: true,
-  // }),
+  capture_tabCapture_FPS: config({
+    label: 'Record FPS',
+    defaultValue: 30,
+    desc: 'Warning: The higher the FPS, the higher the CPU usage, and browser may crash',
+    // relateBy: 'notSameOriginIframeCaptureModePriority',
+    // relateByValue: DocPIPRenderType.capture_tabCapture,
+    notRecommended: true,
+  }),
+  capture_tabCapture_clip: config({
+    label: 'Record clip',
+    defaultValue: false,
+    desc: 'Warning: Consuming performance very much',
+    // relateBy: 'notSameOriginIframeCaptureModePriority',
+    // relateByValue: DocPIPRenderType.capture_tabCapture,
+    notRecommended: true,
+  }),
+  capture_captureStream_autoSetCrossOrigin: config({
+    label: 'Auto set video crossOrigin',
+    defaultValue: true,
+    notRecommended: true,
+  }),
 } as const

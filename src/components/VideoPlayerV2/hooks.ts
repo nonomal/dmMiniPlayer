@@ -39,7 +39,7 @@ export const useTogglePlayState = () => {
 }
 
 /**监听docPIP全局键盘 */
-export const useInWindowKeydown = () => {
+export const useInWindowKeydown = (onKeydown?: (e: KeyboardEvent) => void) => {
   const { webVideo, eventBus, isLive, keydownWindow } = useContext(vpContext)
   const togglePlayState = useTogglePlayState()
 
@@ -49,7 +49,8 @@ export const useInWindowKeydown = () => {
       isSpeedMode = false
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!webVideo) return
-      // if (window.videoPlayers.focusIndex !== index) return
+      // TODO 以后尽量把e.target去掉，因为shadowRoot下接收到冒泡的event.target是shadowRoot，不会是keydown实际的target😅
+      // ? 或者搞个polyfill，支持shadowRoot的event通过一层转发。但会导致isTrusted:false
       const tar = e.target as HTMLElement
       if (
         tar.tagName === 'TEXTAREA' ||
@@ -57,7 +58,7 @@ export const useInWindowKeydown = () => {
         tar.contentEditable === 'true'
       )
         return
-      // e.stopPropagation()
+      onKeydown?.(e)
       switch (e.code) {
         case 'ArrowDown': {
           e.preventDefault()
@@ -105,6 +106,12 @@ export const useInWindowKeydown = () => {
       }
     }
     keydownWindow.addEventListener('keydown', handleKeyDown)
+    // 这是给replacer模式监听的，keydown keyup已经被阻止了，通过一层代理转发和监听
+    const handleKeyDownCustom = (e: KeyboardEvent) => {
+      const detail = e.detail
+      handleKeyDown(detail as any)
+    }
+    keydownWindow.addEventListener('dm-keydown' as any, handleKeyDownCustom)
 
     const handleKeyUp = (e: KeyboardEvent) => {
       if (!webVideo) return
@@ -157,10 +164,18 @@ export const useInWindowKeydown = () => {
       }
     }
     keydownWindow.addEventListener('keyup', handleKeyUp)
+    const handleKeyUpCustom = (e: KeyboardEvent) => {
+      const detail = e.detail
+      handleKeyUp(detail as any)
+    }
+    keydownWindow.addEventListener('dm-keyup' as any, handleKeyUpCustom)
 
     return () => {
       keydownWindow.removeEventListener('keydown', handleKeyDown)
       keydownWindow.removeEventListener('keyup', handleKeyUp)
+
+      keydownWindow.addEventListener('dm-keydown' as any, handleKeyDownCustom)
+      keydownWindow.addEventListener('dm-keyup' as any, handleKeyUpCustom)
     }
   }, [keydownWindow, isLive])
 }

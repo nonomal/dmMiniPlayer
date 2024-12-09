@@ -92,7 +92,13 @@
     "rightBottom": "右下",
     "visible": "是否显示",
     "disableSites": "禁用站点",
-    "disableSitesTips": "支持格式为“/regex/”的正则表达式"
+    "disableSitesTips": "支持格式为“/regex/”的正则表达式",
+    "autoPIPInPageHide": "页面隐藏时自动画中画",
+    "autoPIPInPageHideDesc": "仅支持未静音的视频和同源iframe视频",
+    "autoPIPInScroll": "滚动页面时自动画中画",
+    "autoPIPInScrollDesc": "滚动页面直到该视频不可见，然后打开PIP",
+    "showReplacerBtn": "显示替换视频按钮",
+    "showReplacerBtnDesc": "将网页中的视频播放器替换成插件的视频播放器"
   },
   "popup": {
     "tips": "需要点击下页面才能触发画中画播放",
@@ -103,7 +109,8 @@
     "openSetting": "打开设置"
   },
   "floatButton": {
-    "closeTips": "您可以在扩展菜单中重新打开浮动按钮"
+    "closeTips": "您可以在扩展菜单中重新打开浮动按钮",
+    "smallUpdate": "小更新"
   },
   "vp": {
     "speed": "倍速中 >>",
